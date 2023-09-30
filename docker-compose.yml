@@ -1,0 +1,23 @@
+version: "3.8"
+services:
+  db:
+    image: postgres:16.0
+    volumes:
+      - pgdata_db:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=tasks_manager_db
+      - POSTGRES_USER=tasks_manager_user
+      - POSTGRES_PASSWORD=tasks_manager_pass
+  web:
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile
+    command: /bin/sh -c "/scripts/entrypoint.sh"
+    volumes:
+      - ./app/:/app/
+    ports:
+      - "9000:9000"
+    depends_on:
+      - db
+volumes:
+  pgdata_db:

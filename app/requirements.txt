@@ -1,0 +1,7 @@
+psycopg2==2.9.6
+Django==4.2.3
+django-environ==0.10.0
+djangorestframework==3.14.0
+environ==1.0
+mock==5.1.0
+Pillow==10.0.0
