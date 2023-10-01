@@ -52,8 +52,8 @@ class TasksListViewTextCase(APITestCase):
 
         self.assertListEqual(tasks_list_expected_item_keys, response_task_item_keys)
 
-    @patch("api.tasks.views.list_tasks_for")
+    @patch("api.tasks.views.list_tasks_for_user")
     def test_tasks_list_service_call(self, mock_service):
         self.client.force_authenticate(self.user)
         self.client.get(self.endpoint_url)
-        mock_service.assert_called_once_with(user_id=self.user.id)
+        mock_service.assert_called_once_with(id=self.user.id)
