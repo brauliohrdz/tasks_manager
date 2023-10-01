@@ -1,5 +1,6 @@
 from api.tasks.views import TasksList
 from django.contrib.auth.models import User
+from mock import patch
 from rest_framework import status
 from rest_framework.test import APITestCase
 
@@ -50,3 +51,9 @@ class TasksListViewTextCase(APITestCase):
         tasks_list_expected_item_keys = ["title", "created", "expires", "status"]
 
         self.assertListEqual(tasks_list_expected_item_keys, response_task_item_keys)
+
+    @patch("api.tasks.views.list_tasks_for")
+    def test_tasks_list_service_call(self, mock_service):
+        self.client.force_authenticate(self.user)
+        self.client.get(self.endpoint_url)
+        mock_service.assert_called_once_with(user_id=self.user.id)
