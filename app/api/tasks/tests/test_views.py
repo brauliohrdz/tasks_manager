@@ -57,3 +57,18 @@ class TasksListViewTextCase(APITestCase):
         self.client.force_authenticate(self.user)
         self.client.get(self.endpoint_url)
         mock_service.assert_called_once_with(id=self.user.id)
+
+    def test_tasks_list(self):
+        expected_structure = [
+            {
+                "title": "Mi Task Title",
+                "created": "2023-09-10",
+                "expires": "2023-10-10",
+                "status": "pending",
+            }
+        ]
+
+        self.client.force_authenticate(self.user)
+        response = self.client.get(self.endpoint_url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertListEqual(response.json(), expected_structure)
