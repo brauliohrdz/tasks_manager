@@ -1,4 +1,5 @@
-from backend.tasks.services import create_task, list_tasks_for_user
+from backend.tasks.services import create_task, list_tasks_for_user, update_task
+from django.core.exceptions import ObjectDoesNotExist
 from rest_framework import serializers, status
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
@@ -66,7 +67,12 @@ class UpdateTask(APIView):
 
     def put(self, request, task_uuid):
         try:
-            self._validate_data(request.data)
+            validated_data = self._validate_data(request.data)
+            update_task(
+                task_uuid=str(task_uuid), owner_id=request.user.id, **validated_data
+            )
             return Response(status=status.HTTP_400_BAD_REQUEST)
         except serializers.ValidationError as e:
             return Response({"error": e.detail}, status=status.HTTP_400_BAD_REQUEST)
+        except (ObjectDoesNotExist, PermissionError):
+            return Response(status=status.HTTP_400_BAD_REQUEST)

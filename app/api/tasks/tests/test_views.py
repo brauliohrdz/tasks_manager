@@ -1,6 +1,7 @@
 from api.tasks.views import CreateTask, TasksList, UpdateTask
 from backend.tasks.tests.utils import TaskTestUtils
 from django.contrib.auth.models import User
+from django.core.exceptions import ObjectDoesNotExist
 from django.utils import timezone
 from freezegun import freeze_time
 from mock import patch
@@ -84,6 +85,49 @@ class UpdateTaskTestCase(APITestCase):
 
         expected_error_msg = "Este campo es requerido."
         self.assertEqual(error.get("status")[0], expected_error_msg)
+
+    @patch("api.tasks.views.update_task")
+    def test_update_task_service_call(self, update_task_service_mock):
+        expires_date = timezone.datetime(2099, 12, 31, 23, 59, 59)
+
+        update_data = {
+            "title": "My updated title",
+            "description": "Mi updated description",
+            "expires": timezone.make_aware(
+                expires_date, timezone.get_current_timezone()
+            ),
+            "status": "pending",
+        }
+
+        self.client.force_authenticate(self.user)
+        self.client.put(self.endpoint_url, data=update_data)
+        update_task_service_mock.assert_called_once_with(
+            task_uuid=self.TEST_UUID, owner_id=self.user.id, **update_data
+        )
+
+    @patch("api.tasks.views.update_task", side_effect=ObjectDoesNotExist)
+    def test_unexistent_uuid_returns_400(self, update_task_service_mock):
+        update_data = {
+            "title": "My updated title",
+            "description": "Mi updated description",
+            "expires": "",
+            "status": "pending",
+        }
+        self.client.force_authenticate(self.user)
+        response = self.client.put(self.endpoint_url, data=update_data)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    @patch("api.tasks.views.update_task", side_effect=PermissionError)
+    def test_unautorized_user_gets_400(self, update_task_service_mock):
+        update_data = {
+            "title": "My updated title",
+            "description": "Mi updated description",
+            "expires": "",
+            "status": "pending",
+        }
+        self.client.force_authenticate(self.user)
+        response = self.client.put(self.endpoint_url, data=update_data)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
 
 class CreateTaskTestCase(APITestCase):
