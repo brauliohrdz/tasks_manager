@@ -1,4 +1,4 @@
-from api.tasks.views import CreateTask, TasksList
+from api.tasks.views import CreateTask, TasksList, UpdateTask
 from backend.tasks.tests.utils import TaskTestUtils
 from django.contrib.auth.models import User
 from django.utils import timezone
@@ -8,6 +8,27 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 
 TASKS_API_URL = "/api/v1/tasks/"
+
+
+class UpdateTaskTestCase(APITestCase):
+    endpoint_url_tmp = "%(TASKS_API_URL)supdate/%(task_uuid)s/"
+    TEST_UUID = "ed7358e8-9c1c-4457-b0af-ee652c9c8cf9"
+
+    @property
+    def endpoint_url(self):
+        return self.endpoint_url_tmp % {
+            "TASKS_API_URL": TASKS_API_URL,
+            "task_uuid": self.TEST_UUID,
+        }
+
+    def test_view_url(self):
+        response = self.client.put(self.endpoint_url)
+        self.assertNotEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertIs(response.resolver_match.func.view_class, UpdateTask)
+
+    def test_login_required(self):
+        response = self.client.put(self.endpoint_url)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
 
 class CreateTaskTestCase(APITestCase):
