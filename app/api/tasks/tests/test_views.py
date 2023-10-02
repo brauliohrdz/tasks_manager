@@ -1,4 +1,4 @@
-from api.tasks.views import TasksList
+from api.tasks.views import CreateTask, TasksList
 from backend.tasks.tests.utils import TaskTestUtils
 from django.contrib.auth.models import User
 from freezegun import freeze_time
@@ -6,9 +6,20 @@ from mock import patch
 from rest_framework import status
 from rest_framework.test import APITestCase
 
+TASKS_API_URL = "/api/v1/tasks/"
+
+
+class CreateTaskTestCase(APITestCase):
+    endpoint_url = f"{TASKS_API_URL}create/"
+
+    def test_view_url(self):
+        response = self.client.post(self.endpoint_url)
+        self.assertNotEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertIs(response.resolver_match.func.view_class, CreateTask)
+
 
 class TasksListViewTestCase(APITestCase):
-    endpoint_url = "/api/v1/tasks/list/"
+    endpoint_url = f"{TASKS_API_URL}list/"
 
     @classmethod
     def setUpTestData(cls) -> None:

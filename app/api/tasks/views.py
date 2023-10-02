@@ -23,3 +23,7 @@ class TasksList(APIView):
             self.TasksListSerializer(tasks_data, many=True).data,
             status=status.HTTP_200_OK,
         )
+
+
+class CreateTask(APIView):
+    pass
