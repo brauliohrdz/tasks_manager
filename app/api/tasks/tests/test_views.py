@@ -18,9 +18,10 @@ class TasksListViewTextCase(APITestCase):
     def service_mock_data(self):
         return [
             {
+                "uuid": "fbb45ef5-6d46-435c-9eef-e39783a5abbb",
                 "title": "Mi Task Title",
-                "created": "2023-09-10",
-                "expires": "2023-10-10",
+                "created": "2022-01-01T12:00:00Z",
+                "expires": "2022-01-01T12:00:00Z",
                 "status": "pending",
             }
         ]
@@ -64,7 +65,13 @@ class TasksListViewTextCase(APITestCase):
         response_data = response.json()
         self.assertIs(type(response_data), list)
         response_task_item_keys = list(response_data[0].keys())
-        tasks_list_expected_item_keys = ["title", "created", "expires", "status"]
+        tasks_list_expected_item_keys = [
+            "uuid",
+            "title",
+            "created",
+            "expires",
+            "status",
+        ]
 
         self.assertListEqual(tasks_list_expected_item_keys, response_task_item_keys)
 
@@ -85,21 +92,28 @@ class TasksListViewTextCase(APITestCase):
 
     @freeze_time("2022-01-01 12:00:00")
     def test_integration_with_service(self):
-        TaskTestUtils.create(id=1, title="Mi Task1", owner=self.user)
-        TaskTestUtils.create(id=2, title="Mi Task2", owner=self.user)
-        TaskTestUtils.create(id=3, title="THIS TASK SHOULDN'T BE LISTED")
+        uuids = [
+            "fbb45ef5-6d46-435c-9eef-e39783a5abbb",
+            "ed7358e8-9c1c-4457-b0af-ee652c9c8cf9",
+            "3003a10f-3175-47f1-b404-eeee027102de",
+        ]
+        TaskTestUtils.create(uuid=uuids[0], title="Mi Task1", owner=self.user)
+        TaskTestUtils.create(uuid=uuids[1], title="Mi Task2", owner=self.user)
+        TaskTestUtils.create(uuid=uuids[2], title="THIS TASK SHOULDN'T BE LISTED")
 
         self.client.force_authenticate(self.user)
         response = self.client.get(self.endpoint_url)
 
         expected_tasks = [
             {
+                "uuid": uuids[0],
                 "title": "Mi Task1",
                 "created": "2022-01-01T12:00:00Z",
                 "expires": None,
                 "status": "",
             },
             {
+                "uuid": uuids[1],
                 "title": "Mi Task2",
                 "created": "2022-01-01T12:00:00Z",
                 "expires": None,

@@ -11,6 +11,7 @@ class TasksList(APIView):
     permission_classes = [IsAuthenticated]
 
     class TasksListSerializer(serializers.Serializer):
+        uuid = serializers.UUIDField()
         title = serializers.CharField()
         created = serializers.DateTimeField()
         expires = serializers.DateTimeField()
