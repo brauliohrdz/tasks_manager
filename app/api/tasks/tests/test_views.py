@@ -46,6 +46,37 @@ class CreateTaskTestCase(APITestCase):
         response = self.client.post(self.endpoint_url)
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
+    def test_response_type_is_json(self):
+        response = self.client.get(self.endpoint_url)
+        self.assertEqual(response["Content-Type"], "application/json")
+
+    def test_entry_serializer_has_expected_fields(self):
+        expected_fields = ["title", "description", "expires", "status"]
+        serializer_fields = list(CreateTask.CreateTaskData().fields.keys())
+        self.assertListEqual(expected_fields, serializer_fields)
+
+    def test_title_is_required(self):
+        self.client.force_authenticate(self.user)
+        data = {"status": "pending"}
+        response = self.client.post(self.endpoint_url, data=data)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        error = response.json().get("error")
+        self.assertTrue("title" in error)
+
+        expected_error_msg = "Este campo es requerido."
+        self.assertEqual(error.get("title")[0], expected_error_msg)
+
+    def test_status_is_required(self):
+        self.client.force_authenticate(self.user)
+        data = {"title": "Mi Task"}
+        response = self.client.post(self.endpoint_url, data=data)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        error = response.json().get("error")
+        self.assertTrue("status" in error)
+
+        expected_error_msg = "Este campo es requerido."
+        self.assertEqual(error.get("status")[0], expected_error_msg)
+
 
 class TasksListViewTestCase(APITestCase):
     endpoint_url = f"{TASKS_API_URL}list/"

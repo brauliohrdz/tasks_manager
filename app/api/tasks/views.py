@@ -28,3 +28,20 @@ class TasksList(APIView):
 class CreateTask(APIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
+
+    class CreateTaskData(serializers.Serializer):
+        title = serializers.CharField()
+        description = serializers.CharField(required=False)
+        expires = serializers.DateField(required=False)
+        status = serializers.CharField()
+
+    def _validate_data(self, post_data):
+        task_data_serializer = self.CreateTaskData(data=post_data)
+        task_data_serializer.is_valid(raise_exception=True)
+        return task_data_serializer.validated_data
+
+    def post(self, request):
+        try:
+            self._validate_data(request.POST)
+        except serializers.ValidationError as e:
+            return Response({"error": e.detail}, status=status.HTTP_400_BAD_REQUEST)
