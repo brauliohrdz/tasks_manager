@@ -7,5 +7,6 @@ def list_tasks_for_user(id: int) -> QuerySet[Task]:
     return Task.objects.filter(owner_id=id)
 
 
-def create_task(user_id: int, task_data: dict) -> None:
-    pass
+def create_task(owner_id: int, **kwargs: dict) -> None:
+    assert owner_id, "User id is required"
+    Task.objects.create(owner_id=owner_id, **kwargs)

@@ -1,9 +1,34 @@
-from backend.tasks.services import list_tasks_for_user
+from backend.tasks.services import create_task, list_tasks_for_user
 from django.contrib.auth.models import User
 from django.db.models import QuerySet
 from django.test import TestCase
+from django.utils import timezone
 
 from .utils import TaskTestUtils
+
+
+class CreateTasksTestCase(TestCase):
+    @classmethod
+    def setUpTestData(cls) -> None:
+        cls.user = User.objects.create(username="homerjay@example.com")
+
+    def test_owner_id_is_required(self):
+        with self.assertRaisesMessage(AssertionError, "User id is required"):
+            create_task(owner_id="", task_data={})
+
+    def test_create_task(self):
+        expires_date = timezone.datetime(2099, 12, 31, 23, 59, 59)
+        task_data = {
+            "title": "My Task",
+            "description": "Mi task description",
+            "expires": timezone.make_aware(
+                expires_date, timezone.get_current_timezone()
+            ),
+            "status": "pending",
+        }
+
+        create_task(owner_id=self.user.id, **task_data)
+        self.assertIsNotNone(TaskTestUtils.get(owner_id=self.user.id, **task_data), 1)
 
 
 class ListTasksForUserTestCase(TestCase):

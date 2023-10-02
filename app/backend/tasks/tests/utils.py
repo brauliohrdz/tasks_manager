@@ -24,3 +24,7 @@ class TaskTestUtils:
     def create(cls, title: str, owner: Optional[User] = None, **kwargs):
         owner = owner or cls._create_random_owner()
         return Task.objects.create(title=title, owner=owner, **kwargs)
+
+    @classmethod
+    def get(cls, **kwargs):
+        return Task.objects.filter(**kwargs).first()
