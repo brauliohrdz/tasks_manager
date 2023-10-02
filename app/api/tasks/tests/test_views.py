@@ -7,7 +7,7 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 
 
-class TasksListViewTextCase(APITestCase):
+class TasksListViewTestCase(APITestCase):
     endpoint_url = "/api/v1/tasks/list/"
 
     @classmethod
