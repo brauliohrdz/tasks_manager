@@ -26,4 +26,5 @@ class TasksList(APIView):
 
 
 class CreateTask(APIView):
-    pass
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
