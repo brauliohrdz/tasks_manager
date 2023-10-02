@@ -20,8 +20,8 @@ class TasksListViewTextCase(APITestCase):
             {
                 "uuid": "fbb45ef5-6d46-435c-9eef-e39783a5abbb",
                 "title": "Mi Task Title",
-                "created": "2022-01-01T12:00:00Z",
-                "expires": "2022-01-01T12:00:00Z",
+                "created": "01-01-2022 12:00:00",
+                "expires": "01-01-2022 12:00:00",
                 "status": "pending",
             }
         ]
@@ -108,14 +108,14 @@ class TasksListViewTextCase(APITestCase):
             {
                 "uuid": uuids[0],
                 "title": "Mi Task1",
-                "created": "2022-01-01T12:00:00Z",
+                "created": "01-01-2022 12:00:00",
                 "expires": None,
                 "status": "",
             },
             {
                 "uuid": uuids[1],
                 "title": "Mi Task2",
-                "created": "2022-01-01T12:00:00Z",
+                "created": "01-01-2022 12:00:00",
                 "expires": None,
                 "status": "",
             },
