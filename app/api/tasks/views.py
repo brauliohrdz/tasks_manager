@@ -1,4 +1,4 @@
-from backend.tasks.services import list_tasks_for_user
+from backend.tasks.services import create_task, list_tasks_for_user
 from rest_framework import serializers, status
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
@@ -32,16 +32,18 @@ class CreateTask(APIView):
     class CreateTaskData(serializers.Serializer):
         title = serializers.CharField()
         description = serializers.CharField(required=False)
-        expires = serializers.DateField(required=False)
+        expires = serializers.DateTimeField(required=False, format="%Y-%m-%d %H:%M:%S")
         status = serializers.CharField()
 
-    def _validate_data(self, post_data):
+    def _validate_data(self, post_data) -> dict:
         task_data_serializer = self.CreateTaskData(data=post_data)
         task_data_serializer.is_valid(raise_exception=True)
-        return task_data_serializer.validated_data
+        return dict(task_data_serializer.validated_data)
 
     def post(self, request):
         try:
-            self._validate_data(request.POST)
+            task_data = self._validate_data(request.POST)
+            create_task(owner_id=request.user.id, task_data=task_data)
+            return Response(status=status.HTTP_201_CREATED)
         except serializers.ValidationError as e:
             return Response({"error": e.detail}, status=status.HTTP_400_BAD_REQUEST)

@@ -1,6 +1,7 @@
 from api.tasks.views import CreateTask, TasksList
 from backend.tasks.tests.utils import TaskTestUtils
 from django.contrib.auth.models import User
+from django.utils import timezone
 from freezegun import freeze_time
 from mock import patch
 from rest_framework import status
@@ -76,6 +77,26 @@ class CreateTaskTestCase(APITestCase):
 
         expected_error_msg = "Este campo es requerido."
         self.assertEqual(error.get("status")[0], expected_error_msg)
+
+    @patch("api.tasks.views.create_task")
+    def test_create_task_service_call(self, mock_create_task):
+        expires_date = timezone.datetime(2099, 12, 31, 23, 59, 59)
+
+        task_data = {
+            "title": "My task 1",
+            "description": "Mi task 1 description",
+            "expires": timezone.make_aware(
+                expires_date, timezone.get_current_timezone()
+            ),
+            "status": "pending",
+        }
+
+        self.client.force_authenticate(self.user)
+        self.client.post(self.endpoint_url, data=task_data)
+
+        mock_create_task.assert_called_once_with(
+            owner_id=self.user.id, task_data=task_data
+        )
 
 
 class TasksListViewTestCase(APITestCase):
