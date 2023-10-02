@@ -32,7 +32,7 @@ class CreateTask(APIView):
     class CreateTaskData(serializers.Serializer):
         title = serializers.CharField()
         description = serializers.CharField(required=False)
-        expires = serializers.DateTimeField(required=False, format="%Y-%m-%d %H:%M:%S")
+        expires = serializers.DateTimeField(required=False)
         status = serializers.CharField()
 
     def _validate_data(self, post_data) -> dict:

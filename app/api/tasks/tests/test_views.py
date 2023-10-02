@@ -96,6 +96,19 @@ class CreateTaskTestCase(APITestCase):
 
         mock_create_task.assert_called_once_with(owner_id=self.user.id, **task_data)
 
+    def test_integration_with_create_task_service(self):
+        task_data = {
+            "title": "Integration test task",
+            "description": "Mi task 1 description",
+            "expires": "2101-01-01 15:00:01",
+            "status": "pending",
+        }
+
+        self.client.force_authenticate(self.user)
+        response = self.client.post(self.endpoint_url, data=task_data)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertIsNotNone(TaskTestUtils.get(owner_id=self.user.id, **task_data))
+
 
 class TasksListViewTestCase(APITestCase):
     endpoint_url = f"{TASKS_API_URL}list/"
