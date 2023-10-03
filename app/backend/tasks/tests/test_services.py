@@ -14,6 +14,7 @@ class UpdateTaskTestCase(TestCase):
     @classmethod
     def setUpTestData(cls) -> None:
         cls.user = User.objects.create(username="homerjay@example.com")
+        cls.task = TaskTestUtils.create(title="My task", owner_id=cls.user.id)
 
     def test_task_uuid_is_required(self):
         with self.assertRaisesMessage(AssertionError, "Task uuid is required."):
@@ -24,7 +25,6 @@ class UpdateTaskTestCase(TestCase):
             update_task(task_uuid=self.TEST_UUID, owner_id="", task_data={})
 
     def test_non_editable_fields_raises_field_error(self):
-        task = TaskTestUtils.create(title="My task", owner_id=self.user.id)
         updated_data = {
             "title": "Mi updated title",
             "description": "Mi updated description",
@@ -33,22 +33,21 @@ class UpdateTaskTestCase(TestCase):
         }
 
         with self.assertRaisesMessage(FieldError, "Some fields cannot be updated."):
-            update_task(task_uuid=task.uuid, owner_id=self.user.id, **updated_data)
+            update_task(task_uuid=self.task.uuid, owner_id=self.user.id, **updated_data)
 
     def test_only_task_owner_can_update_task(self):
-        TaskTestUtils.create(uuid=self.TEST_UUID, title="no owned task")
+        no_owned_task = TaskTestUtils.create(title="No owned task")
         updated_data = {
             "title": "Mi updated title",
             "description": "Mi updated description",
             "status": "completed",
         }
         with self.assertRaisesMessage(PermissionError, "User is not task owner"):
-            update_task(task_uuid=self.TEST_UUID, owner_id=self.user.id, **updated_data)
+            update_task(
+                task_uuid=no_owned_task.uuid, owner_id=self.user.id, **updated_data
+            )
 
     def test_invalid_status_raises_exception(self):
-        TaskTestUtils.create(
-            uuid=self.TEST_UUID, title="My task", owner_id=self.user.id
-        )
         updated_data = {
             "title": "Mi updated title",
             "description": "Mi updated description",
@@ -56,21 +55,20 @@ class UpdateTaskTestCase(TestCase):
         }
 
         with self.assertRaises(ValidationError):
-            update_task(task_uuid=self.TEST_UUID, owner_id=self.user.id, **updated_data)
+            update_task(task_uuid=self.task.uuid, owner_id=self.user.id, **updated_data)
 
     def test_update_task(self):
-        task = TaskTestUtils.create(
-            uuid=self.TEST_UUID, title="task", owner_id=self.user.id
-        )
         updated_data = {
             "title": "Mi updated title",
             "description": "Mi updated description",
             "status": "completed",
         }
 
-        update_task(task_uuid=task.uuid, owner_id=self.user.id, **updated_data)
+        update_task(task_uuid=self.task.uuid, owner_id=self.user.id, **updated_data)
         self.assertIsNotNone(
-            TaskTestUtils.get(uuid=task.uuid, owner_id=self.user.id, **updated_data)
+            TaskTestUtils.get(
+                uuid=self.task.uuid, owner_id=self.user.id, **updated_data
+            )
         )
 
 
