@@ -33,6 +33,7 @@ class AddTaskImageTestCase(TestCase):
     @classmethod
     def tearDownClass(cls) -> None:
         shutil.rmtree("images/", ignore_errors=True)
+        super().tearDownClass()
 
     def test_task_uuid_is_required(self):
         with self.assertRaisesMessage(AssertionError, "Task uuid is required."):
@@ -226,9 +227,9 @@ class ListTasksForUserTestCase(TestCase):
 
     def test_service_list_user_tasks_only(self):
         another_user = User.objects.create(username="nedflanders@example.com")
-        TaskTestUtils.create(id=1, title="No listable task", owner=another_user)
-        TaskTestUtils.create(id=2, title="Homer task1", owner=self.user)
-        TaskTestUtils.create(id=3, title="Homer task2", owner=self.user)
+        TaskTestUtils.create(id=1, title="No listable task", owner_id=another_user.id)
+        TaskTestUtils.create(id=2, title="Homer task1", owner_id=self.user.id)
+        TaskTestUtils.create(id=3, title="Homer task2", owner_id=self.user.id)
 
         expected_tasks_ids_for_user = [2, 3]
 
