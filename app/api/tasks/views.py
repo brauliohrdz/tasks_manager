@@ -1,4 +1,9 @@
-from backend.tasks.services import create_task, list_tasks_for_user, update_task
+from backend.tasks.services import (
+    create_task,
+    delete_task,
+    list_tasks_for_user,
+    update_task,
+)
 from django.core.exceptions import ObjectDoesNotExist
 from rest_framework import serializers, status
 from rest_framework.authentication import TokenAuthentication
@@ -83,4 +88,8 @@ class DeleteTask(APIView):
     permission_classes = [IsAuthenticated]
 
     def delete(self, request, task_uuid):
-        return Response(status.HTTP_403_FORBIDDEN)
+        try:
+            delete_task(task_uuid=str(task_uuid), owner_id=request.user.id)
+            return Response(status.HTTP_403_FORBIDDEN)
+        except (ObjectDoesNotExist, PermissionError) as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)

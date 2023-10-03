@@ -59,6 +59,27 @@ class DeleteTaskTestCase(APITestCase):
         response = self.client.delete(self.endpoint_url)
         self.assertEqual(response["Content-Type"], "application/json")
 
+    @patch("api.tasks.views.delete_task")
+    def test_delet_task_service_call(self, mock_delete_task):
+        self.client.force_authenticate(self.user)
+        self.client.delete(self.endpoint_url)
+
+        mock_delete_task.assert_called_once_with(
+            task_uuid=self.TEST_UUID, owner_id=self.user.id
+        )
+
+    @patch("api.tasks.views.delete_task", side_effect=ObjectDoesNotExist)
+    def test_not_valid_uuid_returns_400(self, mock_delete_task):
+        self.client.force_authenticate(self.user)
+        response = self.client.delete(self.endpoint_url)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    @patch("api.tasks.views.delete_task", side_effect=PermissionError)
+    def test_owner_without_permission_returns_400(self, mock_delete_task):
+        self.client.force_authenticate(self.user)
+        response = self.client.delete(self.endpoint_url)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
 
 class UpdateTaskTestCase(APITestCase):
     endpoint_url_tmp = "%(TASKS_API_URL)supdate/%(task_uuid)s/"
