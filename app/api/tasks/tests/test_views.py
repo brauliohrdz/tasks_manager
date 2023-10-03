@@ -80,6 +80,15 @@ class DeleteTaskTestCase(APITestCase):
         response = self.client.delete(self.endpoint_url)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
+    def test_integration_with_delete_task_service(self):
+        TaskTestUtils.create(
+            uuid=self.TEST_UUID, title="Task to delete", owner_id=self.user.id
+        )
+        self.client.force_authenticate(self.user)
+        response = self.client.delete(self.endpoint_url)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertIsNone(TaskTestUtils.first(uuid=self.TEST_UUID))
+
 
 class UpdateTaskTestCase(APITestCase):
     endpoint_url_tmp = "%(TASKS_API_URL)supdate/%(task_uuid)s/"

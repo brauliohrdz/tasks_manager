@@ -90,6 +90,7 @@ class DeleteTask(APIView):
     def delete(self, request, task_uuid):
         try:
             delete_task(task_uuid=str(task_uuid), owner_id=request.user.id)
-            return Response(status.HTTP_403_FORBIDDEN)
+            return Response(status=status.HTTP_204_NO_CONTENT)
         except (ObjectDoesNotExist, PermissionError) as e:
+            print(str(e))
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
