@@ -1,3 +1,4 @@
+import os
 from uuid import uuid4
 
 from django.contrib.auth.models import User
@@ -31,3 +32,17 @@ class Task(models.Model):
     class Meta:
         verbose_name = "Task"
         verbose_name_plural = "Tasks"
+
+
+class TaskImage(models.Model):
+    def image_name(self, filename):
+        extension = filename.split(".")[:-1]
+        return os.path.join("images/", f"{self.uuid}.{extension}")
+
+    uuid = models.UUIDField(unique=True, default=uuid4, editable=False)
+    task = models.ForeignKey(Task, related_name="images", on_delete=models.CASCADE)
+    image = models.ImageField(upload_to=image_name)
+
+    class Meta:
+        verbose_name = "TaskImage"
+        verbose_name_plural = "TaskImages"
