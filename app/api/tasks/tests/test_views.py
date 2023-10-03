@@ -129,6 +129,24 @@ class UpdateTaskTestCase(APITestCase):
         response = self.client.put(self.endpoint_url, data=update_data)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
+    def test_integration_with_update_task_service(self):
+        TaskTestUtils.create(
+            uuid=self.TEST_UUID, title="Mi task", owner_id=self.user.id
+        )
+        update_data = {
+            "title": "My updated title",
+            "description": "Mi updated description",
+            "expires": "2023-12-12 00:00:00",
+            "status": "pending",
+        }
+
+        self.client.force_authenticate(self.user)
+        response = self.client.put(self.endpoint_url, data=update_data)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIsNotNone(
+            TaskTestUtils.get(uuid=self.TEST_UUID, owner_id=self.user.id, **update_data)
+        )
+
 
 class CreateTaskTestCase(APITestCase):
     endpoint_url = f"{TASKS_API_URL}create/"
