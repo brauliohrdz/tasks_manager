@@ -76,7 +76,7 @@ class UpdateTask(APIView):
             update_task(
                 task_uuid=str(task_uuid), owner_id=request.user.id, **validated_data
             )
-            return Response(status=status.HTTP_200_OK)
+            return Response(status=status.HTTP_204_NO_CONTENT)
         except serializers.ValidationError as e:
             return Response({"error": e.detail}, status=status.HTTP_400_BAD_REQUEST)
         except (ObjectDoesNotExist, PermissionError) as e:

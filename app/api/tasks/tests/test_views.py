@@ -221,7 +221,7 @@ class UpdateTaskTestCase(APITestCase):
 
         self.client.force_authenticate(self.user)
         response = self.client.put(self.endpoint_url, data=update_data)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertIsNotNone(
             TaskTestUtils.first(
                 uuid=self.TEST_UUID, owner_id=self.user.id, **update_data
