@@ -50,7 +50,7 @@ class DeleteTaskTestCase(TestCase):
 
         tasks_in_database = TaskTestUtils.count()
         self.assertEqual(tasks_in_database, 1)
-        self.assertIsNone(TaskTestUtils.get(uuid=task_to_delete.uuid))
+        self.assertIsNone(TaskTestUtils.first(uuid=task_to_delete.uuid))
 
 
 class UpdateTaskTestCase(TestCase):
@@ -111,7 +111,7 @@ class UpdateTaskTestCase(TestCase):
 
         update_task(task_uuid=self.task.uuid, owner_id=self.user.id, **updated_data)
         self.assertIsNotNone(
-            TaskTestUtils.get(
+            TaskTestUtils.first(
                 uuid=self.task.uuid, owner_id=self.user.id, **updated_data
             )
         )
@@ -151,7 +151,7 @@ class CreateTasksTestCase(TestCase):
         }
 
         create_task(owner_id=self.user.id, **task_data)
-        self.assertIsNotNone(TaskTestUtils.get(owner_id=self.user.id, **task_data), 1)
+        self.assertIsNotNone(TaskTestUtils.first(owner_id=self.user.id, **task_data), 1)
 
 
 class ListTasksForUserTestCase(TestCase):

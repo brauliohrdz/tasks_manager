@@ -26,7 +26,7 @@ class TaskTestUtils:
         return Task.objects.create(title=title, owner=owner, **kwargs)
 
     @classmethod
-    def get(cls, **kwargs):
+    def first(cls, **kwargs):
         return Task.objects.filter(**kwargs).first()
 
     @classmethod

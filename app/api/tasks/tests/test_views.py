@@ -214,7 +214,9 @@ class UpdateTaskTestCase(APITestCase):
         response = self.client.put(self.endpoint_url, data=update_data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertIsNotNone(
-            TaskTestUtils.get(uuid=self.TEST_UUID, owner_id=self.user.id, **update_data)
+            TaskTestUtils.first(
+                uuid=self.TEST_UUID, owner_id=self.user.id, **update_data
+            )
         )
 
 
@@ -315,7 +317,7 @@ class CreateTaskTestCase(APITestCase):
         self.client.force_authenticate(self.user)
         response = self.client.post(self.endpoint_url, data=task_data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertIsNotNone(TaskTestUtils.get(owner_id=self.user.id, **task_data))
+        self.assertIsNotNone(TaskTestUtils.first(owner_id=self.user.id, **task_data))
 
 
 class TasksListViewTestCase(APITestCase):
