@@ -2,7 +2,6 @@ from uuid import uuid4
 
 from django.contrib.auth.models import User
 from django.db import models
-from django.utils.translation import gettext_lazy as _
 
 
 class Task(models.Model):
@@ -16,22 +15,17 @@ class Task(models.Model):
         User, related_name="tasks", on_delete=models.PROTECT, editable=False
     )
 
-    PENDING = "pending"
-    IN_PROGRESS = "in_progress"
-    COMPLETED = "completed"
+    class StatusChoices(models.TextChoices):
+        PENDING = "pending", "Pending"
+        IN_PROGRESS = "in_progress", "In Progress"
+        COMPLETED = "completed", "Completed"
 
-    STATUS_CHOICES = (
-        (PENDING, _("Pendiente")),
-        (IN_PROGRESS, _("En progreso")),
-        (COMPLETED, _("Completada")),
-    )
-    status = models.CharField(choices=STATUS_CHOICES, max_length=20)
+    status = models.CharField(choices=StatusChoices.choices, max_length=20)
 
     @classmethod
     def editable_fields(cls) -> list[str]:
-        editable_fields = list(
-            filter(lambda f: f.editable and not f.primary_key, cls._meta.fields)
-        )
+        field_is_editable = lambda f: f.editable and not f.primary_key
+        editable_fields = list(filter(field_is_editable, cls._meta.fields))
         return [field.name for field in editable_fields]
 
     class Meta:

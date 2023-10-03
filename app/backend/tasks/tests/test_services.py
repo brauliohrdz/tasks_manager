@@ -1,10 +1,54 @@
-from backend.tasks.services import create_task, list_tasks_for_user
+from backend.tasks.services import create_task, list_tasks_for_user, update_task
 from django.contrib.auth.models import User
+from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import QuerySet
 from django.test import TestCase
 from django.utils import timezone
 
 from .utils import TaskTestUtils
+
+
+class UpdateTaskTestCase(TestCase):
+    TEST_UUID = "ed7358e8-9c1c-4457-b0af-ee652c9c8cf9"
+
+    @classmethod
+    def setUpTestData(cls) -> None:
+        cls.user = User.objects.create(username="homerjay@example.com")
+
+    def test_task_uuid_is_required(self):
+        with self.assertRaisesMessage(AssertionError, "Task uuid is required."):
+            update_task(task_uuid="", owner_id=1, task_data={})
+
+    def test_owner_id_is_required(self):
+        with self.assertRaisesMessage(AssertionError, "Owner id is required."):
+            update_task(task_uuid=self.TEST_UUID, owner_id="", task_data={})
+
+    def test_not_task_owner_raises_does_not_exist(self):
+        TaskTestUtils.create(uuid=self.TEST_UUID, title="no owned task")
+        updated_data = {
+            "title": "Mi updated title",
+            "description": "Mi updated description",
+            "status": "completed",
+        }
+        with self.assertRaisesMessage(
+            ObjectDoesNotExist, "Task matching query does not exist."
+        ):
+            update_task(task_uuid=self.TEST_UUID, owner_id=self.user.id, **updated_data)
+
+    def test_update_task(self):
+        task = TaskTestUtils.create(
+            uuid=self.TEST_UUID, title="task", owner_id=self.user.id
+        )
+        updated_data = {
+            "title": "Mi updated title",
+            "description": "Mi updated description",
+            "status": "completed",
+        }
+
+        update_task(task_uuid=task.uuid, owner_id=self.user, **updated_data)
+        self.assertIsNotNone(
+            TaskTestUtils.get(uuid=task.uuid, owner_id=self.user.id, **updated_data)
+        )
 
 
 class CreateTasksTestCase(TestCase):
@@ -13,7 +57,7 @@ class CreateTasksTestCase(TestCase):
         cls.user = User.objects.create(username="homerjay@example.com")
 
     def test_owner_id_is_required(self):
-        with self.assertRaisesMessage(AssertionError, "User id is required"):
+        with self.assertRaisesMessage(AssertionError, "Owner id is required."):
             create_task(owner_id="", task_data={})
 
     def test_create_task(self):
@@ -41,7 +85,7 @@ class ListTasksForUserTestCase(TestCase):
         self.assertIs(type(tasks), QuerySet)
 
     def test_owner_id_is_required(self):
-        with self.assertRaises(AssertionError):
+        with self.assertRaisesMessage(AssertionError, "User id is required."):
             list_tasks_for_user(id="")
 
     def test_service_list_user_tasks_only(self):
