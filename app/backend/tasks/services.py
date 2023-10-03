@@ -37,3 +37,14 @@ def update_task(task_uuid: int, owner_id: int, **kwargs) -> None:
 
     task.full_clean()
     task.save(update_fields=updated_fields)
+
+
+def delete_task(task_uuid: int, owner_id: int, **kwargs) -> None:
+    assert task_uuid, "Task uuid is required."
+    assert owner_id, "Owner id is required."
+
+    task = Task.objects.get(uuid=task_uuid)
+    is_task_owner = task.owner_id == owner_id
+    if not is_task_owner:
+        raise PermissionError("User is not task owner.")
+    task.delete()

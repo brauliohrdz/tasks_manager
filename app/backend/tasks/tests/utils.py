@@ -28,3 +28,7 @@ class TaskTestUtils:
     @classmethod
     def get(cls, **kwargs):
         return Task.objects.filter(**kwargs).first()
+
+    @classmethod
+    def count(cls, **kwargs):
+        return Task.objects.filter(**kwargs).count()

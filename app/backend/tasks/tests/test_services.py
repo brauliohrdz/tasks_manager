@@ -1,11 +1,56 @@
-from backend.tasks.services import create_task, list_tasks_for_user, update_task
+from backend.tasks.services import (
+    create_task,
+    delete_task,
+    list_tasks_for_user,
+    update_task,
+)
 from django.contrib.auth.models import User
-from django.core.exceptions import FieldError, ValidationError
+from django.core.exceptions import FieldError, ObjectDoesNotExist, ValidationError
 from django.db.models import QuerySet
 from django.test import TestCase
 from django.utils import timezone
 
 from .utils import TaskTestUtils
+
+
+class DeleteTaskTestCase(TestCase):
+    TEST_UUID = "ed7358e8-9c1c-4457-b0af-ee652c9c8cf9"
+
+    @classmethod
+    def setUpTestData(cls) -> None:
+        cls.user = User.objects.create(username="homerjay@example.com")
+        return super().setUpTestData()
+
+    def test_task_uuid_is_required(self):
+        with self.assertRaisesMessage(AssertionError, "Task uuid is required."):
+            delete_task(task_uuid="", owner_id=1)
+
+    def test_task_owner_is_required(self):
+        with self.assertRaisesMessage(AssertionError, "Owner id is required."):
+            delete_task(task_uuid=self.TEST_UUID, owner_id="")
+
+    def test_only_task_owner_can_delete_task(self):
+        no_owned_task = TaskTestUtils.create(title="My task for delete")
+        with self.assertRaisesMessage(PermissionError, "User is not task owner"):
+            delete_task(task_uuid=no_owned_task.uuid, owner_id=self.user.id)
+
+    def test_non_existent_uuid_raises_exception(self):
+        non_existent_uuid = "f9fa2e26-6c95-4cc8-ad70-707ace27c26a"
+        with self.assertRaisesMessage(
+            ObjectDoesNotExist, "Task matching query does not exist."
+        ):
+            delete_task(task_uuid=non_existent_uuid, owner_id=self.user.id)
+
+    def test_task_delete(self):
+        TaskTestUtils.create(title="My task", owner_id=self.user.id)
+        task_to_delete = TaskTestUtils.create(title="task_to_delete")
+        tasks_in_database = TaskTestUtils.count()
+        self.assertEqual(tasks_in_database, 2)
+        delete_task(task_uuid=task_to_delete.uuid, owner_id=task_to_delete.owner_id)
+
+        tasks_in_database = TaskTestUtils.count()
+        self.assertEqual(tasks_in_database, 1)
+        self.assertIsNone(TaskTestUtils.get(uuid=task_to_delete.uuid))
 
 
 class UpdateTaskTestCase(TestCase):
