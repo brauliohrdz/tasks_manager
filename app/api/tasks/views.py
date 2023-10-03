@@ -76,3 +76,11 @@ class UpdateTask(APIView):
             return Response({"error": e.detail}, status=status.HTTP_400_BAD_REQUEST)
         except (ObjectDoesNotExist, PermissionError) as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class DeleteTask(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request, task_uuid):
+        return Response(status.HTTP_403_FORBIDDEN)

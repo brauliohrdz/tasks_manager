@@ -1,4 +1,4 @@
-from api.tasks.views import CreateTask, TasksList, UpdateTask
+from api.tasks.views import CreateTask, DeleteTask, TasksList, UpdateTask
 from backend.tasks.tests.utils import TaskTestUtils
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
@@ -9,6 +9,51 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 
 TASKS_API_URL = "/api/v1/tasks/"
+
+
+class DeleteTaskTestCase(APITestCase):
+    endpoint_url_tmp = "%(TASKS_API_URL)sdelete/%(task_uuid)s/"
+    TEST_UUID = "ed7358e8-9c1c-4457-b0af-ee652c9c8cf9"
+
+    @property
+    def endpoint_url(self):
+        return self.endpoint_url_tmp % {
+            "TASKS_API_URL": TASKS_API_URL,
+            "task_uuid": self.TEST_UUID,
+        }
+
+    @classmethod
+    def setUpTestData(cls) -> None:
+        cls.user = User.objects.create(username="admin", email="admin@example.com")
+
+    def test_view_url(self):
+        response = self.client.delete(self.endpoint_url)
+        self.assertNotEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertIs(response.resolver_match.func.view_class, DeleteTask)
+
+    def test_login_required(self):
+        response = self.client.delete(self.endpoint_url)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_get_method_is_not_allowed(self):
+        self.client.force_authenticate(self.user)
+        response = self.client.get(self.endpoint_url)
+        self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def test_patch_method_is_not_allowed(self):
+        self.client.force_authenticate(self.user)
+        response = self.client.patch(self.endpoint_url)
+        self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def test_post_method_is_not_allowed(self):
+        self.client.force_authenticate(self.user)
+        response = self.client.post(self.endpoint_url)
+        self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def test_put_method_is_not_allowed(self):
+        self.client.force_authenticate(self.user)
+        response = self.client.put(self.endpoint_url)
+        self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
 class UpdateTaskTestCase(APITestCase):
