@@ -1,4 +1,4 @@
-from backend.tasks.models import Task
+from backend.tasks.models import Task, TaskImage
 from django.core.exceptions import FieldError
 from django.db.models import QuerySet
 
@@ -13,7 +13,7 @@ def get_task_for_owner(task_uuid: str, owner_id: int):
 
 def list_tasks_for_user(id: int) -> QuerySet[Task]:
     assert id, "User id is required."
-    return Task.objects.filter(owner_id=id)
+    return Task.objects.filter(owner_id=id).prefetch_related("images")
 
 
 def create_task(owner_id: int, **kwargs) -> Task:
@@ -52,11 +52,12 @@ def delete_task(task_uuid: int, owner_id: int, **kwargs) -> None:
     task.delete()
 
 
-# def add_task_image(task_uuid: int, owner_id: int, image) -> None:
-#     assert task_uuid, "Task uuid is required."
-#     assert owner_id, "Owner id is required."
+def create_task_image(task_uuid: int, owner_id: int, image) -> None:
+    assert task_uuid, "Task uuid is required."
+    assert owner_id, "Owner id is required."
 
-#     task = Task.objects.get(uuid=task_uuid)
-#     task_image = TaskImage(image=image, task_id=task.id)
-#     task_image.full_clean()
-#     task_image.save()
+    task = get_task_for_owner(task_uuid=task_uuid, owner_id=owner_id)
+    task_image = TaskImage(image=image, task_id=task.id)
+    task_image.full_clean()
+    task_image.save()
+    return task_image

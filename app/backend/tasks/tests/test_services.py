@@ -1,16 +1,73 @@
+import shutil
+
 from backend.tasks.services import (
     create_task,
+    create_task_image,
     delete_task,
     list_tasks_for_user,
     update_task,
 )
 from django.contrib.auth.models import User
 from django.core.exceptions import FieldError, ObjectDoesNotExist, ValidationError
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db.models import QuerySet
 from django.test import TestCase
 from django.utils import timezone
 
-from .utils import TaskTestUtils
+from .utils import TaskImageTestUtils, TaskTestUtils
+
+
+class AddTaskImageTestCase(TestCase):
+    TEST_IMAGE = b"\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x01\x00\x00\x00\x01\x08\x00\x00\x00\xc0\xbd\xa5\x9e\x00\x00\x00\x0bIDAT\x08\xd7c\xfc\xff\xff?\x00\x05\x00\x01\r\n\x00\x00\x00\x00IEND\xaeB`\x82"
+
+    @classmethod
+    def setUpTestData(cls) -> None:
+        cls.user = User.objects.create(username="homerjay@example.com")
+        cls.task = TaskTestUtils.create(title="My Task", owner_id=cls.user.id)
+        cls.image = SimpleUploadedFile(
+            "test_image.png", cls.TEST_IMAGE, content_type="image/png"
+        )
+
+        return super().setUpTestData()
+
+    @classmethod
+    def tearDownClass(cls) -> None:
+        shutil.rmtree("images/", ignore_errors=True)
+
+    def test_task_uuid_is_required(self):
+        with self.assertRaisesMessage(AssertionError, "Task uuid is required."):
+            create_task_image(task_uuid="", owner_id=self.user.id, image=self.image)
+
+    def test_task_owner_is_required(self):
+        with self.assertRaisesMessage(AssertionError, "Owner id is required."):
+            create_task_image(task_uuid=self.task.uuid, owner_id="", image=self.image)
+
+    def test_non_existent_task_uuid_raises_exception(self):
+        non_existent_uuid = "f9fa2e26-6c95-4cc8-ad70-707ace27c26a"
+        with self.assertRaisesMessage(
+            ObjectDoesNotExist, "Task matching query does not exist."
+        ):
+            create_task_image(
+                task_uuid=non_existent_uuid, owner_id=self.user.id, image=self.image
+            )
+
+    def test_only_task_owner_can_add_images(self):
+        no_owned_task = TaskTestUtils.create(title="no owned task")
+        with self.assertRaisesMessage(PermissionError, "User is not task owner."):
+            create_task_image(
+                task_uuid=no_owned_task.uuid, owner_id=self.user.id, image=self.image
+            )
+
+    def test_add_task_image(self):
+        task_image = create_task_image(
+            task_uuid=self.task.uuid, owner_id=self.user.id, image=self.image
+        )
+
+        task_image = TaskImageTestUtils.first(
+            uuid=task_image.uuid, task_id=self.task.id
+        )
+        self.assertIsNotNone(task_image)
+        self.assertEqual(task_image.image.read(), self.TEST_IMAGE)
 
 
 class DeleteTaskTestCase(TestCase):
