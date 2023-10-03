@@ -60,7 +60,6 @@ class DeleteTaskTestCase(APITestCase):
         self.assertEqual(response["Content-Type"], "application/json")
 
 
-
 class UpdateTaskTestCase(APITestCase):
     endpoint_url_tmp = "%(TASKS_API_URL)supdate/%(task_uuid)s/"
     TEST_UUID = "ed7358e8-9c1c-4457-b0af-ee652c9c8cf9"
