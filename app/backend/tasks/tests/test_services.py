@@ -1,6 +1,6 @@
 from backend.tasks.services import create_task, list_tasks_for_user, update_task
 from django.contrib.auth.models import User
-from django.core.exceptions import ObjectDoesNotExist, ValidationError
+from django.core.exceptions import FieldError, ValidationError
 from django.db.models import QuerySet
 from django.test import TestCase
 from django.utils import timezone
@@ -22,6 +22,18 @@ class UpdateTaskTestCase(TestCase):
     def test_owner_id_is_required(self):
         with self.assertRaisesMessage(AssertionError, "Owner id is required."):
             update_task(task_uuid=self.TEST_UUID, owner_id="", task_data={})
+
+    def test_non_editable_fields_raises_field_error(self):
+        task = TaskTestUtils.create(title="My task", owner_id=self.user.id)
+        updated_data = {
+            "title": "Mi updated title",
+            "description": "Mi updated description",
+            "status": "completed",
+            "uuid": self.TEST_UUID,
+        }
+
+        with self.assertRaisesMessage(FieldError, "Some fields cannot be updated."):
+            update_task(task_uuid=task.uuid, owner_id=self.user.id, **updated_data)
 
     def test_only_task_owner_can_update_task(self):
         TaskTestUtils.create(uuid=self.TEST_UUID, title="no owned task")

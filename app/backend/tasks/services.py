@@ -1,4 +1,5 @@
 from backend.tasks.models import Task
+from django.core.exceptions import FieldError
 from django.db.models import QuerySet
 
 
@@ -19,8 +20,14 @@ def update_task(task_uuid: int, owner_id: int, **kwargs) -> None:
     assert owner_id, "Owner id is required."
 
     task = Task.objects.get(uuid=task_uuid)
-    if task.owner_id != owner_id:
-        raise PermissionError("User is not task owner")
+    is_task_owner = task.owner_id == owner_id
+    if not is_task_owner:
+        raise PermissionError("User is not task owner.")
+
+    editable_fields = Task.editable_fields()
+    all_fields_are_editable = all([field in editable_fields for field in kwargs.keys()])
+    if not all_fields_are_editable:
+        raise FieldError("Some fields cannot be updated.")
 
     updated_fields = []
     for field, value in kwargs.items():
