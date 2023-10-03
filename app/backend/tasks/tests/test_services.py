@@ -23,16 +23,14 @@ class UpdateTaskTestCase(TestCase):
         with self.assertRaisesMessage(AssertionError, "Owner id is required."):
             update_task(task_uuid=self.TEST_UUID, owner_id="", task_data={})
 
-    def test_not_task_owner_raises_does_not_exist(self):
+    def test_only_task_owner_can_update_task(self):
         TaskTestUtils.create(uuid=self.TEST_UUID, title="no owned task")
         updated_data = {
             "title": "Mi updated title",
             "description": "Mi updated description",
             "status": "completed",
         }
-        with self.assertRaisesMessage(
-            ObjectDoesNotExist, "Task matching query does not exist."
-        ):
+        with self.assertRaisesMessage(PermissionError, "User is not task owner"):
             update_task(task_uuid=self.TEST_UUID, owner_id=self.user.id, **updated_data)
 
     def test_invalid_status_raises_exception(self):
@@ -58,7 +56,7 @@ class UpdateTaskTestCase(TestCase):
             "status": "completed",
         }
 
-        update_task(task_uuid=task.uuid, owner_id=self.user, **updated_data)
+        update_task(task_uuid=task.uuid, owner_id=self.user.id, **updated_data)
         self.assertIsNotNone(
             TaskTestUtils.get(uuid=task.uuid, owner_id=self.user.id, **updated_data)
         )

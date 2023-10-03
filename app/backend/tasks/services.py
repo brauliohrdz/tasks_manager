@@ -18,7 +18,10 @@ def update_task(task_uuid: int, owner_id: int, **kwargs) -> None:
     assert task_uuid, "Task uuid is required."
     assert owner_id, "Owner id is required."
 
-    task = Task.objects.get(uuid=task_uuid, owner_id=owner_id)
+    task = Task.objects.get(uuid=task_uuid)
+    if task.owner_id != owner_id:
+        raise PermissionError("User is not task owner")
+
     updated_fields = []
     for field, value in kwargs.items():
         if field in Task.editable_fields():
