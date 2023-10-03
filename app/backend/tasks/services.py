@@ -9,7 +9,9 @@ def list_tasks_for_user(id: int) -> QuerySet[Task]:
 
 def create_task(owner_id: int, **kwargs) -> None:
     assert owner_id, "Owner id is required."
-    Task.objects.create(owner_id=owner_id, **kwargs)
+    task = Task(owner_id=owner_id, **kwargs)
+    task.full_clean()
+    task.save()
 
 
 def update_task(task_uuid: int, owner_id: int, **kwargs) -> None:
@@ -23,4 +25,5 @@ def update_task(task_uuid: int, owner_id: int, **kwargs) -> None:
             setattr(task, field, value)
             updated_fields.append(field)
 
+    task.full_clean()
     task.save(update_fields=updated_fields)

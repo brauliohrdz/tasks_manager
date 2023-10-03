@@ -24,7 +24,7 @@ class Task(models.Model):
 
     @classmethod
     def editable_fields(cls) -> list[str]:
-        field_is_editable = lambda f: f.editable and not f.primary_key
+        field_is_editable = lambda f: f.editable and not f.primary_key  # noqa: E731
         editable_fields = list(filter(field_is_editable, cls._meta.fields))
         return [field.name for field in editable_fields]
 

@@ -1,6 +1,6 @@
 from backend.tasks.services import create_task, list_tasks_for_user, update_task
 from django.contrib.auth.models import User
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db.models import QuerySet
 from django.test import TestCase
 from django.utils import timezone
@@ -35,6 +35,19 @@ class UpdateTaskTestCase(TestCase):
         ):
             update_task(task_uuid=self.TEST_UUID, owner_id=self.user.id, **updated_data)
 
+    def test_invalid_status_raises_exception(self):
+        TaskTestUtils.create(
+            uuid=self.TEST_UUID, title="My task", owner_id=self.user.id
+        )
+        updated_data = {
+            "title": "Mi updated title",
+            "description": "Mi updated description",
+            "status": "myinvalidstatus",
+        }
+
+        with self.assertRaises(ValidationError):
+            update_task(task_uuid=self.TEST_UUID, owner_id=self.user.id, **updated_data)
+
     def test_update_task(self):
         task = TaskTestUtils.create(
             uuid=self.TEST_UUID, title="task", owner_id=self.user.id
@@ -59,6 +72,19 @@ class CreateTasksTestCase(TestCase):
     def test_owner_id_is_required(self):
         with self.assertRaisesMessage(AssertionError, "Owner id is required."):
             create_task(owner_id="", task_data={})
+
+    def test_invalid_status_raises_validation_error(self):
+        expires_date = timezone.datetime(2099, 12, 31, 23, 59, 59)
+        task_data = {
+            "title": "My Task",
+            "description": "Mi task description",
+            "expires": timezone.make_aware(
+                expires_date, timezone.get_current_timezone()
+            ),
+            "status": "myfakestatusnotvalidatall",
+        }
+        with self.assertRaises(ValidationError):
+            create_task(owner_id=self.user.id, **task_data)
 
     def test_create_task(self):
         expires_date = timezone.datetime(2099, 12, 31, 23, 59, 59)

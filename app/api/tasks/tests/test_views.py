@@ -221,7 +221,7 @@ class CreateTaskTestCase(APITestCase):
             "title": "Integration test task",
             "description": "Mi task 1 description",
             "expires": "2101-01-01 15:00:01",
-            "status": "pending",
+            "status": "completed",
         }
 
         self.client.force_authenticate(self.user)
