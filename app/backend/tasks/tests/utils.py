@@ -2,6 +2,7 @@ import random
 import string
 from io import BytesIO
 from typing import Optional
+from uuid import uuid4
 
 from backend.tasks.models import Task, TaskImage
 from django.contrib.auth.models import User
@@ -60,7 +61,8 @@ class TaskImageTestUtils:
     ):
         image = image or cls.simple_uploaded_image()
         task_id = task_id or TaskTestUtils.create(title="my random task").id
-        return TaskImage.objects.create(task_id=task_id, image=image)
+        uuid = uuid or uuid4()
+        return TaskImage.objects.create(uuid=uuid, task_id=task_id, image=image)
 
     @classmethod
     def first(cls, **kwargs):
