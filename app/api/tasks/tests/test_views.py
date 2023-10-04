@@ -1,3 +1,5 @@
+import shutil
+
 from api.tasks.views import (
     CreateTask,
     CreateTaskImage,
@@ -31,6 +33,11 @@ class CreateTaskImageTestCase(APITestCase):
     @classmethod
     def setUpTestData(cls) -> None:
         cls.user = User.objects.create(username="admin", email="admin@example.com")
+
+    @classmethod
+    def tearDownClass(cls) -> None:
+        shutil.rmtree("images/", ignore_errors=True)
+        super().tearDownClass()
 
     def test_view_url(self):
         self.client.force_authenticate(self.user)
