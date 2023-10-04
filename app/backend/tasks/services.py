@@ -18,7 +18,7 @@ def get_task_image_for_owner(task_image_uuid: str, owner_id: int) -> TaskImage:
     is_task_image_owner = task_image.owner_id == owner_id
     if is_task_image_owner:
         return task_image
-    raise PermissionError("User is not image owner")
+    raise PermissionError("User is not image owner.")
 
 
 def list_tasks_for_user(id: int) -> QuerySet[Task]:
@@ -71,3 +71,11 @@ def create_task_image(task_uuid: int, owner_id: int, image) -> None:
     task_image.full_clean()
     task_image.save()
     return task_image
+
+
+def delete_task_image(task_image_uuid: int, owner_id: int) -> None:
+    assert task_image_uuid, "TaskImage uuid is required."
+    assert owner_id, "Owner id is required."
+
+    task_image = get_task_image_for_owner(task_image_uuid, owner_id)
+    task_image.delete()
