@@ -1,14 +1,5 @@
-import shutil
-
-from api.tasks.views import (
-    CreateTask,
-    CreateTaskImage,
-    DeleteTask,
-    TasksList,
-    UpdateTask,
-)
-from backend.tasks.tests.utils import TaskImageTestUtils, TaskTestUtils
-from django.conf import settings
+from api.tasks.views import CreateTask, DeleteTask, TasksList, UpdateTask
+from backend.tasks.tests.utils import TaskTestUtils
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils import timezone
@@ -18,86 +9,6 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 
 TASKS_API_URL = "/api/v1/tasks/"
-
-
-class CreateTaskImageTestCase(APITestCase):
-    endpoint_url = endpoint_url_tmp = "%(TASKS_API_URL)simage/create/%(task_uuid)s/"
-    TEST_UUID = "ed7358e8-9c1c-4457-b0af-ee652c9c8cf9"
-
-    @property
-    def endpoint_url(self):
-        return self.endpoint_url_tmp % {
-            "TASKS_API_URL": TASKS_API_URL,
-            "task_uuid": self.TEST_UUID,
-        }
-
-    @classmethod
-    def setUpTestData(cls) -> None:
-        cls.user = User.objects.create(username="admin", email="admin@example.com")
-
-    @classmethod
-    def tearDownClass(cls) -> None:
-        shutil.rmtree("images/", ignore_errors=True)
-        super().tearDownClass()
-
-    def test_view_url(self):
-        self.client.force_authenticate(self.user)
-        response = self.client.post(self.endpoint_url)
-        self.assertNotEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-        self.assertIs(response.resolver_match.func.view_class, CreateTaskImage)
-
-    def test_get_method_is_not_allowed(self):
-        self.client.force_authenticate(self.user)
-        response = self.client.get(self.endpoint_url)
-        self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
-
-    def test_patch_method_is_not_allowed(self):
-        self.client.force_authenticate(self.user)
-        response = self.client.patch(self.endpoint_url)
-        self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
-
-    def test_put_method_is_not_allowed(self):
-        self.client.force_authenticate(self.user)
-        response = self.client.put(self.endpoint_url)
-        self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
-
-    def test_delete_method_is_not_allowed(self):
-        self.client.force_authenticate(self.user)
-        response = self.client.delete(self.endpoint_url)
-        self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
-
-    def test_login_required(self):
-        response = self.client.post(self.endpoint_url)
-        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
-
-    def test_response_type_is_json(self):
-        response = self.client.post(self.endpoint_url)
-        self.assertEqual(response["Content-Type"], "application/json")
-
-    def test_integration_create_task_image(self):
-        task = TaskTestUtils.create(
-            uuid=self.TEST_UUID, owner_id=self.user.id, title="my task with image"
-        )
-        image = TaskImageTestUtils.simple_uploaded_image()
-        data = {"image": image}
-        self.client.force_authenticate(self.user)
-        response = self.client.post(
-            self.endpoint_url,
-            data,
-            format="multipart",
-        )
-
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        task_image = TaskImageTestUtils.first(task_id=task.id)
-        self.assertIsNotNone(task_image)
-        self.assertEqual(
-            task_image.image.read(), TaskImageTestUtils.simple_uploaded_image().read()
-        )
-        print(settings.UPLOAD_IMAGES_PATH)
-        expected_url = (
-            f"{settings.MEDIA_URL}{settings.UPLOAD_IMAGES_PATH}{task_image.uuid}.jpeg"
-        )
-        self.assertEqual(response.json().get("image"), expected_url)
 
 
 class DeleteTaskTestCase(APITestCase):
@@ -148,7 +59,7 @@ class DeleteTaskTestCase(APITestCase):
         response = self.client.delete(self.endpoint_url)
         self.assertEqual(response["Content-Type"], "application/json")
 
-    @patch("api.tasks.views.delete_task")
+    @patch("api.tasks.views.tasks_views.delete_task")
     def test_delet_task_service_call(self, mock_delete_task):
         self.client.force_authenticate(self.user)
         self.client.delete(self.endpoint_url)
@@ -157,13 +68,13 @@ class DeleteTaskTestCase(APITestCase):
             task_uuid=self.TEST_UUID, owner_id=self.user.id
         )
 
-    @patch("api.tasks.views.delete_task", side_effect=ObjectDoesNotExist)
+    @patch("api.tasks.views.tasks_views.delete_task", side_effect=ObjectDoesNotExist)
     def test_not_valid_uuid_returns_400(self, mock_delete_task):
         self.client.force_authenticate(self.user)
         response = self.client.delete(self.endpoint_url)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-    @patch("api.tasks.views.delete_task", side_effect=PermissionError)
+    @patch("api.tasks.views.tasks_views.delete_task", side_effect=PermissionError)
     def test_owner_without_permission_returns_400(self, mock_delete_task):
         self.client.force_authenticate(self.user)
         response = self.client.delete(self.endpoint_url)
@@ -254,7 +165,7 @@ class UpdateTaskTestCase(APITestCase):
         expected_error_msg = "Este campo es requerido."
         self.assertEqual(error.get("status")[0], expected_error_msg)
 
-    @patch("api.tasks.views.update_task")
+    @patch("api.tasks.views.tasks_views.update_task")
     def test_update_task_service_call(self, update_task_service_mock):
         expires_date = timezone.datetime(2099, 12, 31, 23, 59, 59)
 
@@ -273,7 +184,7 @@ class UpdateTaskTestCase(APITestCase):
             task_uuid=self.TEST_UUID, owner_id=self.user.id, **update_data
         )
 
-    @patch("api.tasks.views.update_task", side_effect=ObjectDoesNotExist)
+    @patch("api.tasks.views.tasks_views.update_task", side_effect=ObjectDoesNotExist)
     def test_unexistent_uuid_returns_400(self, update_task_service_mock):
         update_data = {
             "title": "My updated title",
@@ -285,7 +196,7 @@ class UpdateTaskTestCase(APITestCase):
         response = self.client.put(self.endpoint_url, data=update_data)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-    @patch("api.tasks.views.update_task", side_effect=PermissionError)
+    @patch("api.tasks.views.tasks_views.update_task", side_effect=PermissionError)
     def test_unautorized_user_gets_400(self, update_task_service_mock):
         update_data = {
             "title": "My updated title",
@@ -386,7 +297,7 @@ class CreateTaskTestCase(APITestCase):
         expected_error_msg = "Este campo es requerido."
         self.assertEqual(error.get("status")[0], expected_error_msg)
 
-    @patch("api.tasks.views.create_task")
+    @patch("api.tasks.views.tasks_views.create_task")
     def test_create_task_service_call(self, mock_create_task):
         expires_date = timezone.datetime(2099, 12, 31, 23, 59, 59)
 
@@ -471,7 +382,7 @@ class TasksListViewTestCase(APITestCase):
         response = self.client.get(self.endpoint_url)
         self.assertEqual(response["Content-Type"], "application/json")
 
-    @patch("api.tasks.views.list_tasks_for_user")
+    @patch("api.tasks.views.tasks_views.list_tasks_for_user")
     def test_response_has_expected_structure(self, mock_service):
         mock_service.return_value = self.service_mock_data
 
@@ -491,13 +402,13 @@ class TasksListViewTestCase(APITestCase):
 
         self.assertListEqual(tasks_list_expected_item_keys, response_task_item_keys)
 
-    @patch("api.tasks.views.list_tasks_for_user")
+    @patch("api.tasks.views.tasks_views.list_tasks_for_user")
     def test_tasks_list_service_call(self, mock_service):
         self.client.force_authenticate(self.user)
         self.client.get(self.endpoint_url)
         mock_service.assert_called_once_with(id=self.user.id)
 
-    @patch("api.tasks.views.list_tasks_for_user")
+    @patch("api.tasks.views.tasks_views.list_tasks_for_user")
     def test_tasks_list(self, mock_service):
         mock_service.return_value = self.service_mock_data
 
