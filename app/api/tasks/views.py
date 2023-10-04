@@ -1,5 +1,6 @@
 from backend.tasks.services import (
     create_task,
+    create_task_image,
     delete_task,
     list_tasks_for_user,
     update_task,
@@ -92,5 +93,29 @@ class DeleteTask(APIView):
             delete_task(task_uuid=str(task_uuid), owner_id=request.user.id)
             return Response(status=status.HTTP_204_NO_CONTENT)
         except (ObjectDoesNotExist, PermissionError) as e:
-            print(str(e))
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class CreateTaskImage(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    class TaskImageSerializer(serializers.Serializer):
+        image = serializers.ImageField(required=True)
+
+    def _validate_data(self, post_data):
+        image_serializer = self.TaskImageSerializer(data=post_data)
+        image_serializer.is_valid(raise_exception=True)
+        return image_serializer.validated_data
+
+    def post(self, request, task_uuid):
+        try:
+            image_data = self._validate_data(request.POST)
+            create_task_image(
+                task_uuid=str(task_uuid),
+                owner_id=request.user.id,
+                image=image_data.get("image"),
+            )
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        except (ObjectDoesNotExist, PermissionError) as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
