@@ -1,10 +1,12 @@
 import random
 import string
+from io import BytesIO
 from typing import Optional
 
 from backend.tasks.models import Task, TaskImage
 from django.contrib.auth.models import User
 from django.core.files.uploadedfile import SimpleUploadedFile
+from PIL import Image
 
 
 class TaskTestUtils:
@@ -36,18 +38,18 @@ class TaskTestUtils:
 
 
 class TaskImageTestUtils:
-    TEST_IMAGE_CONTENT = b"\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x01\x00\x00\x00\x01\x08\x00\x00\x00\xc0\xbd\xa5\x9e\x00\x00\x00\x0bIDAT\x08\xd7c\xfc\xff\xff?\x00\x05\x00\x01\r\n\x00\x00\x00\x00IEND\xaeB`\x82"
+    TEST_IMAGE_CONTENT = b"image_simulated_content"
 
     @staticmethod
     def simple_uploaded_image(
         name: Optional[str] = None,
-        content: Optional[str] = None,
-        content_type: Optional[str] = None,
     ):
-        name = name or "test_image.png"
-        content = content or TaskImageTestUtils.TEST_IMAGE_CONTENT
-        content_type = content_type or "image/png"
-        return SimpleUploadedFile(name, content, content_type=content_type)
+        name = name or "test_image.jpeg"
+        content = BytesIO()
+        img = Image.new("RGB", (100, 100))
+        img.save(content, "jpeg")
+        content_type = "image/jpeg"
+        return SimpleUploadedFile(name, content.getvalue(), content_type=content_type)
 
     @classmethod
     def _create_random_owner(cls):
