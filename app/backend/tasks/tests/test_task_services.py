@@ -1,7 +1,6 @@
 from backend.tasks.services import (
     create_task,
     delete_task,
-    get_task_image_for_owner,
     list_tasks_for_user,
     update_task,
 )
