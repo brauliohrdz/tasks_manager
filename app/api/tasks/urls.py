@@ -18,7 +18,7 @@ images_patterns = [
     path(
         "delete/<uuid:task_image_uuid>/",
         DeleteTaskImage.as_view(),
-        name="create_task_image",
+        name="delete_task_image",
     ),
 ]
 

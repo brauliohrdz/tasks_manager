@@ -22,6 +22,5 @@ class AuthTokenView(APIView):
             return Response({"token": token}, status=status.HTTP_200_OK)
         except serializers.ValidationError as e:
             return Response({"error": e.detail}, status=status.HTTP_400_BAD_REQUEST)
-
         except PermissionDenied as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
