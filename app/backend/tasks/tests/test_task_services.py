@@ -1,11 +1,6 @@
-import shutil
-
 from backend.tasks.services import (
     create_task,
-    create_task_image,
     delete_task,
-    delete_task_image,
-    get_task_image_for_owner,
     list_tasks_for_user,
     update_task,
 )
@@ -15,152 +10,10 @@ from django.db.models import QuerySet
 from django.test import TestCase
 from django.utils import timezone
 
-from .utils import TaskImageTestUtils, TaskTestUtils
+from .utils import TaskTestUtils
 
 
-class DeleteTaskImageTestCase(TestCase):
-    TEST_UUID = "ed7358e8-9c1c-4457-b0af-ee652c9c8cf9"
-
-    @classmethod
-    def setUpTestData(cls) -> None:
-        cls.user = User.objects.create(username="homerjay@example.com")
-        cls.task = TaskTestUtils.create(title="Mi task", owner_id=cls.user.id)
-        cls.task_image = TaskImageTestUtils.create(task_id=cls.task.id)
-        return super().setUpTestData()
-
-    def test_task_uuid_is_required(self):
-        with self.assertRaisesMessage(AssertionError, "TaskImage uuid is required."):
-            delete_task_image(task_image_uuid="", owner_id=1)
-
-    def test_task_owner_is_required(self):
-        with self.assertRaisesMessage(AssertionError, "Owner id is required."):
-            delete_task_image(task_image_uuid=self.TEST_UUID, owner_id="")
-
-    def test_only_task_owner_can_delete_task(self):
-        no_owned_task_image = TaskImageTestUtils.create()
-        with self.assertRaisesMessage(PermissionError, "User is not image owner."):
-            delete_task_image(
-                task_image_uuid=no_owned_task_image.uuid, owner_id=self.user.id
-            )
-
-    def test_non_existent_uuid_raises_exception(self):
-        non_existent_uuid = "f9fa2e26-6c95-4cc8-ad70-707ace27c26a"
-        with self.assertRaisesMessage(
-            ObjectDoesNotExist, "TaskImage matching query does not exist."
-        ):
-            delete_task_image(task_image_uuid=non_existent_uuid, owner_id=self.user.id)
-
-    def test_task_delete(self):
-        my_task = TaskTestUtils.create(title="My task", owner_id=self.user.id)
-        TaskImageTestUtils.create(task_id=my_task.id)
-        task_image_to_delete = TaskImageTestUtils.create()
-        tasks_images_in_database = TaskImageTestUtils.count()
-        self.assertEqual(tasks_images_in_database, 3)
-        delete_task_image(
-            task_image_uuid=task_image_to_delete.uuid,
-            owner_id=task_image_to_delete.owner_id,
-        )
-
-        tasks_in_database = TaskImageTestUtils.count()
-        self.assertEqual(tasks_in_database, 2)
-        self.assertIsNone(TaskImageTestUtils.first(uuid=task_image_to_delete.uuid))
-
-
-class GetTaskImageForOwnerTestCase(TestCase):
-    @classmethod
-    def setUpTestData(cls) -> None:
-        cls.user = User.objects.create(username="homerjay@example.com")
-        cls.task = TaskTestUtils.create(title="My Task", owner_id=cls.user.id)
-        cls.task_image = TaskImageTestUtils.create(task_id=cls.task.id)
-
-        return super().setUpTestData()
-
-    @classmethod
-    def tearDownClass(cls) -> None:
-        shutil.rmtree("images/", ignore_errors=True)
-        super().tearDownClass()
-
-    def test_task_uuid_is_required(self):
-        with self.assertRaisesMessage(AssertionError, "TaskImage uuid is required."):
-            get_task_image_for_owner(task_image_uuid="", owner_id=self.user.id)
-
-    def test_task_owner_is_required(self):
-        with self.assertRaisesMessage(AssertionError, "Owner id is required."):
-            get_task_image_for_owner(task_image_uuid=self.task_image.uuid, owner_id="")
-
-    def test_non_existent_task_image_uuid_raises_exception(self):
-        non_existent_uuid = "f9fa2e26-6c95-4cc8-ad70-707ace27c26a"
-        with self.assertRaisesMessage(
-            ObjectDoesNotExist, "TaskImage matching query does not exist."
-        ):
-            get_task_image_for_owner(
-                task_image_uuid=non_existent_uuid, owner_id=self.user.id
-            )
-
-    def test_only_task_owner_can_get_images(self):
-        no_owned_task_image = TaskImageTestUtils.create()
-        with self.assertRaisesMessage(PermissionError, "User is not image owner."):
-            get_task_image_for_owner(
-                task_image_uuid=no_owned_task_image.uuid, owner_id=self.user.id
-            )
-
-    def test_get_image_for_owner(self):
-        pass
-
-
-class AddTaskImageTestCase(TestCase):
-    @classmethod
-    def setUpTestData(cls) -> None:
-        cls.user = User.objects.create(username="homerjay@example.com")
-        cls.task = TaskTestUtils.create(title="My Task", owner_id=cls.user.id)
-        cls.image = TaskImageTestUtils.simple_uploaded_image()
-
-        return super().setUpTestData()
-
-    @classmethod
-    def tearDownClass(cls) -> None:
-        shutil.rmtree("images/", ignore_errors=True)
-        super().tearDownClass()
-
-    def test_task_uuid_is_required(self):
-        with self.assertRaisesMessage(AssertionError, "Task uuid is required."):
-            create_task_image(task_uuid="", owner_id=self.user.id, image=self.image)
-
-    def test_task_owner_is_required(self):
-        with self.assertRaisesMessage(AssertionError, "Owner id is required."):
-            create_task_image(task_uuid=self.task.uuid, owner_id="", image=self.image)
-
-    def test_non_existent_task_uuid_raises_exception(self):
-        non_existent_uuid = "f9fa2e26-6c95-4cc8-ad70-707ace27c26a"
-        with self.assertRaisesMessage(
-            ObjectDoesNotExist, "Task matching query does not exist."
-        ):
-            create_task_image(
-                task_uuid=non_existent_uuid, owner_id=self.user.id, image=self.image
-            )
-
-    def test_only_task_owner_can_add_images(self):
-        no_owned_task = TaskTestUtils.create(title="no owned task")
-        with self.assertRaisesMessage(PermissionError, "User is not task owner."):
-            create_task_image(
-                task_uuid=no_owned_task.uuid, owner_id=self.user.id, image=self.image
-            )
-
-    def test_add_task_image(self):
-        task_image = create_task_image(
-            task_uuid=self.task.uuid, owner_id=self.user.id, image=self.image
-        )
-
-        task_image = TaskImageTestUtils.first(
-            uuid=task_image.uuid, task_id=self.task.id
-        )
-        self.assertIsNotNone(task_image)
-        self.assertEqual(
-            task_image.image.read(), TaskImageTestUtils.simple_uploaded_image().read()
-        )
-
-
-class DeleteTaskTestCase(TestCase):
+class BaseTaskTestCase(TestCase):
     TEST_UUID = "ed7358e8-9c1c-4457-b0af-ee652c9c8cf9"
 
     @classmethod
@@ -168,6 +21,8 @@ class DeleteTaskTestCase(TestCase):
         cls.user = User.objects.create(username="homerjay@example.com")
         return super().setUpTestData()
 
+
+class DeleteTaskTestCase(BaseTaskTestCase):
     def test_task_uuid_is_required(self):
         with self.assertRaisesMessage(AssertionError, "Task uuid is required."):
             delete_task(task_uuid="", owner_id=1)
@@ -200,12 +55,10 @@ class DeleteTaskTestCase(TestCase):
         self.assertIsNone(TaskTestUtils.first(uuid=task_to_delete.uuid))
 
 
-class UpdateTaskTestCase(TestCase):
-    TEST_UUID = "ed7358e8-9c1c-4457-b0af-ee652c9c8cf9"
-
+class UpdateTaskTestCase(BaseTaskTestCase):
     @classmethod
     def setUpTestData(cls) -> None:
-        cls.user = User.objects.create(username="homerjay@example.com")
+        super().setUpTestData()
         cls.task = TaskTestUtils.create(title="My task", owner_id=cls.user.id)
 
     def test_task_uuid_is_required(self):
@@ -264,11 +117,7 @@ class UpdateTaskTestCase(TestCase):
         )
 
 
-class CreateTasksTestCase(TestCase):
-    @classmethod
-    def setUpTestData(cls) -> None:
-        cls.user = User.objects.create(username="homerjay@example.com")
-
+class CreateTasksTestCase(BaseTaskTestCase):
     def test_owner_id_is_required(self):
         with self.assertRaisesMessage(AssertionError, "Owner id is required."):
             create_task(owner_id="", task_data={})
@@ -301,11 +150,7 @@ class CreateTasksTestCase(TestCase):
         self.assertIsNotNone(TaskTestUtils.first(owner_id=self.user.id, **task_data), 1)
 
 
-class ListTasksForUserTestCase(TestCase):
-    @classmethod
-    def setUpTestData(cls) -> None:
-        cls.user = User.objects.create(username="homerjay@example.com")
-
+class ListTasksForUserTestCase(BaseTaskTestCase):
     def test_service_returns_queryset(self):
         tasks = list_tasks_for_user(id=self.user.id)
         self.assertIs(type(tasks), QuerySet)
