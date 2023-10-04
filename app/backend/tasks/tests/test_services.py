@@ -4,6 +4,7 @@ from backend.tasks.services import (
     create_task,
     create_task_image,
     delete_task,
+    get_task_image_for_owner,
     list_tasks_for_user,
     update_task,
 )
@@ -14,6 +15,48 @@ from django.test import TestCase
 from django.utils import timezone
 
 from .utils import TaskImageTestUtils, TaskTestUtils
+
+
+class GetTaskImageForOwnerTestCase(TestCase):
+    @classmethod
+    def setUpTestData(cls) -> None:
+        cls.user = User.objects.create(username="homerjay@example.com")
+        cls.task = TaskTestUtils.create(title="My Task", owner_id=cls.user.id)
+        cls.task_image = TaskImageTestUtils.create(task_id=cls.task.id)
+
+        return super().setUpTestData()
+
+    @classmethod
+    def tearDownClass(cls) -> None:
+        shutil.rmtree("images/", ignore_errors=True)
+        super().tearDownClass()
+
+    def test_task_uuid_is_required(self):
+        with self.assertRaisesMessage(AssertionError, "TaskImage uuid is required."):
+            get_task_image_for_owner(task_image_uuid="", owner_id=self.user.id)
+
+    def test_task_owner_is_required(self):
+        with self.assertRaisesMessage(AssertionError, "Owner id is required."):
+            get_task_image_for_owner(task_image_uuid=self.task_image.uuid, owner_id="")
+
+    def test_non_existent_task_image_uuid_raises_exception(self):
+        non_existent_uuid = "f9fa2e26-6c95-4cc8-ad70-707ace27c26a"
+        with self.assertRaisesMessage(
+            ObjectDoesNotExist, "TaskImage matching query does not exist."
+        ):
+            get_task_image_for_owner(
+                task_image_uuid=non_existent_uuid, owner_id=self.user.id
+            )
+
+    def test_only_task_owner_can_get_images(self):
+        no_owned_task_image = TaskImageTestUtils.create()
+        with self.assertRaisesMessage(PermissionError, "User is not image owner."):
+            get_task_image_for_owner(
+                task_image_uuid=no_owned_task_image.uuid, owner_id=self.user.id
+            )
+
+    def test_get_image_for_owner(self):
+        pass
 
 
 class AddTaskImageTestCase(TestCase):

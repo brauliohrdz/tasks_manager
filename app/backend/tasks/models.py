@@ -43,6 +43,10 @@ class TaskImage(models.Model):
     task = models.ForeignKey(Task, related_name="images", on_delete=models.CASCADE)
     image = models.ImageField(upload_to=image_name)
 
+    @property
+    def owner_id(self):
+        return self.task.owner_id
+
     class Meta:
         verbose_name = "TaskImage"
         verbose_name_plural = "TaskImages"

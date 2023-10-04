@@ -11,6 +11,16 @@ def get_task_for_owner(task_uuid: str, owner_id: int):
     raise PermissionError("User is not task owner.")
 
 
+def get_task_image_for_owner(task_image_uuid: str, owner_id: int) -> TaskImage:
+    assert task_image_uuid, "TaskImage uuid is required."
+    assert owner_id, "Owner id is required."
+    task_image = TaskImage.objects.get(uuid=task_image_uuid)
+    is_task_image_owner = task_image.owner_id == owner_id
+    if is_task_image_owner:
+        return task_image
+    raise PermissionError("User is not image owner")
+
+
 def list_tasks_for_user(id: int) -> QuerySet[Task]:
     assert id, "User id is required."
     return Task.objects.filter(owner_id=id).prefetch_related("images")

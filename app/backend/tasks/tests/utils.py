@@ -54,11 +54,12 @@ class TaskImageTestUtils:
     @classmethod
     def create(
         cls,
-        task_id: int,
+        task_id: Optional[int] = None,
         image: Optional[SimpleUploadedFile] = None,
+        uuid: Optional[str] = None,
     ):
         image = image or cls.simple_uploaded_image()
-        task_id = task_id or TaskTestUtils.create(name="my random task").id
+        task_id = task_id or TaskTestUtils.create(title="my random task").id
         return TaskImage.objects.create(task_id=task_id, image=image)
 
     @classmethod
