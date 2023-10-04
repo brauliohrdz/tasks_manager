@@ -52,15 +52,14 @@ class TaskImageTestUtils:
         return SimpleUploadedFile(name, content.getvalue(), content_type=content_type)
 
     @classmethod
-    def _create_random_owner(cls):
-        username = cls._generate_username()
-        email = f"{username}@example.com"
-        return User.objects.create(username=username, email=email)
-
-    @classmethod
-    def create(cls, image, task_id: str, owner_id: Optional[User] = None):
-        owner_id = owner_id or cls._create_random_owner().id
-        return TaskImage.objects.create(task_id, owner_id=owner_id, image=image)
+    def create(
+        cls,
+        task_id: int,
+        image: Optional[SimpleUploadedFile] = None,
+    ):
+        image = image or cls.simple_uploaded_image()
+        task_id = task_id or TaskTestUtils.create(name="my random task").id
+        return TaskImage.objects.create(task_id=task_id, image=image)
 
     @classmethod
     def first(cls, **kwargs):
