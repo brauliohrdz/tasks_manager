@@ -9,7 +9,6 @@ from backend.tasks.services import (
 )
 from django.contrib.auth.models import User
 from django.core.exceptions import FieldError, ObjectDoesNotExist, ValidationError
-from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db.models import QuerySet
 from django.test import TestCase
 from django.utils import timezone
@@ -18,15 +17,11 @@ from .utils import TaskImageTestUtils, TaskTestUtils
 
 
 class AddTaskImageTestCase(TestCase):
-    TEST_IMAGE = b"\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x01\x00\x00\x00\x01\x08\x00\x00\x00\xc0\xbd\xa5\x9e\x00\x00\x00\x0bIDAT\x08\xd7c\xfc\xff\xff?\x00\x05\x00\x01\r\n\x00\x00\x00\x00IEND\xaeB`\x82"
-
     @classmethod
     def setUpTestData(cls) -> None:
         cls.user = User.objects.create(username="homerjay@example.com")
         cls.task = TaskTestUtils.create(title="My Task", owner_id=cls.user.id)
-        cls.image = SimpleUploadedFile(
-            "test_image.png", cls.TEST_IMAGE, content_type="image/png"
-        )
+        cls.image = TaskImageTestUtils.simple_uploaded_image()
 
         return super().setUpTestData()
 
@@ -68,7 +63,7 @@ class AddTaskImageTestCase(TestCase):
             uuid=task_image.uuid, task_id=self.task.id
         )
         self.assertIsNotNone(task_image)
-        self.assertEqual(task_image.image.read(), self.TEST_IMAGE)
+        self.assertEqual(task_image.image.read(), TaskImageTestUtils.TEST_IMAGE_CONTENT)
 
 
 class DeleteTaskTestCase(TestCase):
