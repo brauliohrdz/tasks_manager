@@ -103,19 +103,21 @@ class CreateTaskImage(APIView):
     class TaskImageSerializer(serializers.Serializer):
         image = serializers.ImageField(required=True)
 
-    def _validate_data(self, post_data):
-        image_serializer = self.TaskImageSerializer(data=post_data)
+    def _validate_data(self, data):
+        image_serializer = self.TaskImageSerializer(data=data)
         image_serializer.is_valid(raise_exception=True)
         return image_serializer.validated_data
 
     def post(self, request, task_uuid):
         try:
-            image_data = self._validate_data(request.POST)
-            create_task_image(
+            image_data = self._validate_data(request.data)
+            task_image = create_task_image(
                 task_uuid=str(task_uuid),
                 owner_id=request.user.id,
                 image=image_data.get("image"),
             )
-            return Response(status=status.HTTP_204_NO_CONTENT)
+            return Response(
+                {"image": task_image.image.url}, status=status.HTTP_201_CREATED
+            )
         except (ObjectDoesNotExist, PermissionError) as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)

@@ -63,7 +63,9 @@ class AddTaskImageTestCase(TestCase):
             uuid=task_image.uuid, task_id=self.task.id
         )
         self.assertIsNotNone(task_image)
-        self.assertEqual(task_image.image.read(), TaskImageTestUtils.TEST_IMAGE_CONTENT)
+        self.assertEqual(
+            task_image.image.read(), TaskImageTestUtils.simple_uploaded_image().read()
+        )
 
 
 class DeleteTaskTestCase(TestCase):

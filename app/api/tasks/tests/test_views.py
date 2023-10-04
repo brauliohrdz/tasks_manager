@@ -1,6 +1,11 @@
-from api.tasks.views import (CreateTask, CreateTaskImage, DeleteTask,
-                             TasksList, UpdateTask)
-from backend.tasks.tests.utils import TaskTestUtils
+from api.tasks.views import (
+    CreateTask,
+    CreateTaskImage,
+    DeleteTask,
+    TasksList,
+    UpdateTask,
+)
+from backend.tasks.tests.utils import TaskImageTestUtils, TaskTestUtils
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils import timezone
@@ -58,8 +63,31 @@ class CreateTaskImageTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_response_type_is_json(self):
-        response = self.client.get(self.endpoint_url)
+        response = self.client.post(self.endpoint_url)
         self.assertEqual(response["Content-Type"], "application/json")
+
+    def test_integration_create_task_image(self):
+        task = TaskTestUtils.create(
+            uuid=self.TEST_UUID, owner_id=self.user.id, title="my task with image"
+        )
+        image = TaskImageTestUtils.simple_uploaded_image()
+        data = {"image": image}
+        self.client.force_authenticate(self.user)
+        response = self.client.post(
+            self.endpoint_url,
+            data,
+            format="multipart",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        task_image = TaskImageTestUtils.first(task_id=task.id)
+        self.assertIsNotNone(task_image)
+        self.assertEqual(
+            task_image.image.read(), TaskImageTestUtils.simple_uploaded_image().read()
+        )
+
+        expected_url = f"/images/{task_image.uuid}.test_image"
+        self.assertEqual(response.json().get("image"), expected_url)
 
 
 class DeleteTaskTestCase(APITestCase):
