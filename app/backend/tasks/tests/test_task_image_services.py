@@ -1,5 +1,3 @@
-import shutil
-
 from backend.tasks.services import (
     create_task_image,
     delete_task_image,
@@ -21,11 +19,6 @@ class BaseTaskImageTestCase(TestCase):
         cls.task = TaskTestUtils.create(title="Mi task", owner_id=cls.user.id)
         cls.task_image = TaskImageTestUtils.create(task_id=cls.task.id)
         return super().setUpTestData()
-
-    @classmethod
-    def tearDownClass(cls) -> None:
-        shutil.rmtree("images/", ignore_errors=True)
-        super().tearDownClass()
 
 
 class DeleteTaskImageTestCase(BaseTaskImageTestCase):

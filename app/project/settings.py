@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 import os
+import sys
 from pathlib import Path
 
 import environ
@@ -133,6 +134,13 @@ USE_TZ = True
 
 STATIC_URL = "static/"
 
+# Media files (images, documents ...)
+MEDIA_FOLDER_NAME = "media"
+MEDIA_ROOT = os.path.join(BASE_DIR, MEDIA_FOLDER_NAME)
+MEDIA_URL = "media/"
+
+# Uploaded task images path
+UPLOAD_IMAGES_PATH = "images/"
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
@@ -141,3 +149,12 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 REST_FRAMEWORK = {
     "DATETIME_FORMAT": "%d-%m-%Y %H:%M:%S",
 }
+
+# Settings for tests
+if "test" in sys.argv or "test_coverage" in sys.argv:
+    import tempfile
+
+    MEDIA_ROOT = tempfile.gettempdir()
+    DEBUG = True
+    ALLOWED_HOSTS = ["*"]
+    UPLOAD_IMAGES_PATH = "test/images/"

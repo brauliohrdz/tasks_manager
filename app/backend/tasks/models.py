@@ -1,6 +1,7 @@
 import os
 from uuid import uuid4
 
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import models
 
@@ -36,8 +37,8 @@ class Task(models.Model):
 
 class TaskImage(models.Model):
     def image_name(self, filename):
-        extension = filename.split(".")[:-1]
-        return os.path.join("images/", f"{self.uuid}.{extension}")
+        extension = filename.split(".")[-1]
+        return os.path.join(settings.UPLOAD_IMAGES_PATH, f"{self.uuid}.{extension}")
 
     uuid = models.UUIDField(unique=True, default=uuid4, editable=False)
     task = models.ForeignKey(Task, related_name="images", on_delete=models.CASCADE)

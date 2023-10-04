@@ -8,6 +8,7 @@ from api.tasks.views import (
     UpdateTask,
 )
 from backend.tasks.tests.utils import TaskImageTestUtils, TaskTestUtils
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils import timezone
@@ -92,8 +93,10 @@ class CreateTaskImageTestCase(APITestCase):
         self.assertEqual(
             task_image.image.read(), TaskImageTestUtils.simple_uploaded_image().read()
         )
-
-        expected_url = f"/images/{task_image.uuid}.test_image"
+        print(settings.UPLOAD_IMAGES_PATH)
+        expected_url = (
+            f"{settings.MEDIA_URL}{settings.UPLOAD_IMAGES_PATH}{task_image.uuid}.jpeg"
+        )
         self.assertEqual(response.json().get("image"), expected_url)
 
 
