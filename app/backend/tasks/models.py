@@ -13,9 +13,7 @@ class Task(models.Model):
     expires = models.DateTimeField(null=True, blank=True)
     title = models.CharField(max_length=200)
     description = models.TextField(null=True, blank=True)
-    owner = models.ForeignKey(
-        User, related_name="tasks", on_delete=models.PROTECT, editable=False
-    )
+    owner = models.ForeignKey(User, related_name="tasks", on_delete=models.PROTECT)
 
     class StatusChoices(models.TextChoices):
         PENDING = "pending", "Pending"
