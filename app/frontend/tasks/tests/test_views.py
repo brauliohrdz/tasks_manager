@@ -4,7 +4,7 @@ from backend.tasks.tests.utils import TaskTestUtils
 from backend.users.tests.utils import UserTestUtils
 from django.test import TestCase
 from django.urls import reverse
-from frontend.tasks.views import TasksList
+from frontend.tasks.views import CreateTask, TasksList
 
 
 class TasksListViewTestCase(TestCase):
@@ -40,3 +40,30 @@ class TasksListViewTestCase(TestCase):
         tasks_titles = [task.title for task in tasks]
         self.assertEqual(len(tasks_titles), 2)
         self.assertListEqual(["my_task_1", "my_task_2"], tasks_titles)
+
+
+class CreateTaskViewTestCase(TestCase):
+    view_url = "/tasks/create/"
+    view_name = "tasks_create"
+    template = "tasks_form.html"
+
+    def test_view_url(self):
+        response = self.client.get(self.view_url)
+        self.assertNotEqual(response.status_code, HTTPStatus.NOT_FOUND)
+        self.assertIs(response.resolver_match.func.view_class, CreateTask)
+
+    def test_view_name(self):
+        url = reverse(self.view_name)
+        response = self.client.get(url)
+        self.assertNotEqual(response.status_code, HTTPStatus.NOT_FOUND)
+        self.assertIs(response.resolver_match.func.view_class, CreateTask)
+
+    def test_login_required(self):
+        response = self.client.get(self.view_url)
+        self.assertEqual(response.status_code, HTTPStatus.FOUND)
+
+    def task_get_uses_correct_form(self):
+        response = self.client.get(self.view_url)
+        self.assertEqual(response.status_code, HTTPStatus.FOUND)
+        form = response.context.get("form")
+        self.assertIs(form.__class__, TaskForm)
