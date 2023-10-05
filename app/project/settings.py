@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     "backend.tasks",
     "backend.users",
     "frontend.users",
+    "frontend.tasks",
 ]
 
 MIDDLEWARE = [
@@ -151,6 +152,9 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 REST_FRAMEWORK = {
     "DATETIME_FORMAT": "%d-%m-%Y %H:%M:%S",
 }
+
+LOGIN_URL = "/login/"
+LOGIN_REDIRECT_URL = "/tasks/"
 
 # Settings for tests
 if "test" in sys.argv or "test_coverage" in sys.argv:
