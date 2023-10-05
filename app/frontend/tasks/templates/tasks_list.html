@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+
+{% block title %} Mis Tareas {% endblock %}
+
+{% block main %}
+<div>
+    <a href="">Añadir Tarea</a>
+</div>
+<div>
+    <ul>
+        {% for task in tasks %}
+        <li> <strong>{{ task.title }} </strong> <br>
+            {{ task.description }} <br><small> {{ task.status }} {{ task.created }} </small>
+        </li>
+        {% empty %}
+
+        <li> No hay tareas para mostrar</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}
