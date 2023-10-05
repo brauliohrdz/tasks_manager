@@ -61,9 +61,3 @@ class CreateTaskViewTestCase(TestCase):
     def test_login_required(self):
         response = self.client.get(self.view_url)
         self.assertEqual(response.status_code, HTTPStatus.FOUND)
-
-    def task_get_uses_correct_form(self):
-        response = self.client.get(self.view_url)
-        self.assertEqual(response.status_code, HTTPStatus.FOUND)
-        form = response.context.get("form")
-        self.assertIs(form.__class__, TaskForm)
