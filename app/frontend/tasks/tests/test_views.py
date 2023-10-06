@@ -4,7 +4,7 @@ from backend.tasks.tests.utils import TaskTestUtils
 from backend.users.tests.utils import UserTestUtils
 from django.test import TestCase
 from django.urls import reverse
-from frontend.tasks.views import CreateTask, TasksList, UpdateTask
+from frontend.tasks.views import CreateTask, DeleteTask, TasksList, UpdateTask
 
 
 class TasksListViewTestCase(TestCase):
@@ -145,3 +145,51 @@ class UpdateTaskViewTestCase(TestCase):
         self.assertEqual(task.description, post_data.get("description"))
         self.assertEqual(task.status, post_data.get("status"))
         self.assertEqual(task.expires.strftime("%Y-%m-%d"), post_data.get("expires"))
+
+
+class DeleteTaskViewTestCase(TestCase):
+    test_uuid = "21fb4127-c9e6-4040-8684-dceeeb8eb816"
+    view_url = f"/tasks/delete/{test_uuid}/"
+    view_name = "tasks_delete"
+
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.user = UserTestUtils.create()
+
+    def test_view_url(self):
+        response = self.client.delete(self.view_url)
+        self.assertNotEqual(response.status_code, HTTPStatus.NOT_FOUND)
+        self.assertIs(response.resolver_match.func.view_class, DeleteTask)
+
+    def test_view_name(self):
+        url = reverse(self.view_name, args=[self.test_uuid])
+        response = self.client.delete(url)
+        self.assertNotEqual(response.status_code, HTTPStatus.NOT_FOUND)
+        self.assertIs(response.resolver_match.func.view_class, DeleteTask)
+
+    def test_login_required(self):
+        response = self.client.delete(self.view_url)
+        self.assertEqual(response.status_code, HTTPStatus.FOUND)
+
+    def test_non_existent_task_uuid_returns_404(self):
+        self.client.force_login(self.user)
+        response = self.client.delete(self.view_url)
+        self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)
+        response = self.client.post(self.view_url, data={"title": "foo title"})
+
+    def test_non_task_owner_cannot_delete_task(self):
+        TaskTestUtils.create(title="My Task", uuid=self.test_uuid)
+        self.client.force_login(self.user)
+        response = self.client.delete(self.view_url)
+        self.assertEqual(response.status_code, HTTPStatus.FORBIDDEN)
+
+    def test_user_can_delete_task(self):
+        TaskTestUtils.create(
+            title="My Task", owner_id=self.user.id, uuid=self.test_uuid
+        )
+        self.assertIsNotNone(TaskTestUtils.first(uuid=self.test_uuid))
+        self.client.force_login(self.user)
+        response = self.client.delete(self.view_url)
+        self.assertEqual(response.status_code, HTTPStatus.FOUND)
+        self.assertIsNone(TaskTestUtils.first(uuid=self.test_uuid))

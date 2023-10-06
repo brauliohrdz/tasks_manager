@@ -68,6 +68,8 @@ class UpdateTask(LoginRequiredMixin, View):
 
     def get(self, request, task_uuid):
         try:
+            task = get_task_for_owner(task_uuid, owner_id=request.user.id)
+            form = TaskForm(model_to_dict(task))
             return render(request, self.template_name, {"form": form})
         except ObjectDoesNotExist:
             return HttpResponseNotFound("No se ha encontrado la tarea indicada")
@@ -91,9 +93,10 @@ class UpdateTask(LoginRequiredMixin, View):
 
 
 class DeleteTask(LoginRequiredMixin, View):
-    def get(self, request, task_uuid):
+    def delete(self, request, task_uuid):
         try:
             delete_task(task_uuid, owner_id=request.user.id)
+            messages.success(request, "La tarea se ha eliminado correctamente.")
             return HttpResponseRedirect(reverse("tasks_list"))
         except ObjectDoesNotExist:
             return HttpResponseNotFound("No se ha encontrado la tarea indicada")
