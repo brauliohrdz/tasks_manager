@@ -94,6 +94,7 @@ class UpdateTaskViewTestCase(TestCase):
         response = self.client.get(self.view_url)
         self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)
         response = self.client.post(self.view_url, data={"title": "foo title"})
+        self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)
 
     def test_non_task_owner_cannot_accest_to_task_data(self):
         TaskTestUtils.create(title="My Task", uuid=self.test_uuid)

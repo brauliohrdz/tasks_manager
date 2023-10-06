@@ -3,7 +3,6 @@ from django import forms
 from django.contrib import messages
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import (
-    HttpResponse,
     HttpResponseForbidden,
     HttpResponseNotFound,
     HttpResponseRedirect,
