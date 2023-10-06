@@ -158,30 +158,30 @@ class DeleteTaskViewTestCase(TestCase):
         cls.user = UserTestUtils.create()
 
     def test_view_url(self):
-        response = self.client.delete(self.view_url)
+        response = self.client.get(self.view_url)
         self.assertNotEqual(response.status_code, HTTPStatus.NOT_FOUND)
         self.assertIs(response.resolver_match.func.view_class, DeleteTask)
 
     def test_view_name(self):
         url = reverse(self.view_name, args=[self.test_uuid])
-        response = self.client.delete(url)
+        response = self.client.get(url)
         self.assertNotEqual(response.status_code, HTTPStatus.NOT_FOUND)
         self.assertIs(response.resolver_match.func.view_class, DeleteTask)
 
     def test_login_required(self):
-        response = self.client.delete(self.view_url)
+        response = self.client.get(self.view_url)
         self.assertEqual(response.status_code, HTTPStatus.FOUND)
 
     def test_non_existent_task_uuid_returns_404(self):
         self.client.force_login(self.user)
-        response = self.client.delete(self.view_url)
+        response = self.client.get(self.view_url)
         self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)
         response = self.client.post(self.view_url, data={"title": "foo title"})
 
     def test_non_task_owner_cannot_delete_task(self):
         TaskTestUtils.create(title="My Task", uuid=self.test_uuid)
         self.client.force_login(self.user)
-        response = self.client.delete(self.view_url)
+        response = self.client.get(self.view_url)
         self.assertEqual(response.status_code, HTTPStatus.FORBIDDEN)
 
     def test_user_can_delete_task(self):
@@ -190,6 +190,6 @@ class DeleteTaskViewTestCase(TestCase):
         )
         self.assertIsNotNone(TaskTestUtils.first(uuid=self.test_uuid))
         self.client.force_login(self.user)
-        response = self.client.delete(self.view_url)
+        response = self.client.get(self.view_url)
         self.assertEqual(response.status_code, HTTPStatus.FOUND)
         self.assertIsNone(TaskTestUtils.first(uuid=self.test_uuid))
