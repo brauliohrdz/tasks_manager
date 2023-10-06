@@ -1,3 +1,4 @@
+from frontend.tasks.views.tasks_images_views import CreateTaskImage
 from frontend.tasks.views.tasks_views import (
     CreateTask,
     DeleteTask,
@@ -5,4 +6,10 @@ from frontend.tasks.views.tasks_views import (
     UpdateTask,
 )
 
-__all__ = ["TasksList", "CreateTask", "UpdateTask", "DeleteTask"]
+__all__ = [
+    "TasksList",
+    "CreateTask",
+    "UpdateTask",
+    "DeleteTask",
+    "CreateTaskImage",
+]

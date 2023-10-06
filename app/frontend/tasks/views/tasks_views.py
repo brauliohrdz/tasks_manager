@@ -70,7 +70,7 @@ class UpdateTask(LoginRequiredMixin, View):
         try:
             task = get_task_for_owner(task_uuid, owner_id=request.user.id)
             form = TaskForm(model_to_dict(task))
-            return render(request, self.template_name, {"form": form})
+            return render(request, self.template_name, {"form": form, "task": task})
         except ObjectDoesNotExist:
             return HttpResponseNotFound("No se ha encontrado la tarea indicada")
         except PermissionError:
