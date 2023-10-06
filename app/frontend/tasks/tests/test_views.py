@@ -4,7 +4,7 @@ from backend.tasks.tests.utils import TaskTestUtils
 from backend.users.tests.utils import UserTestUtils
 from django.test import TestCase
 from django.urls import reverse
-from frontend.tasks.views import CreateTask, TasksList
+from frontend.tasks.views import CreateTask, TasksList, UpdateTask
 
 
 class TasksListViewTestCase(TestCase):
@@ -57,6 +57,28 @@ class CreateTaskViewTestCase(TestCase):
         response = self.client.get(url)
         self.assertNotEqual(response.status_code, HTTPStatus.NOT_FOUND)
         self.assertIs(response.resolver_match.func.view_class, CreateTask)
+
+    def test_login_required(self):
+        response = self.client.get(self.view_url)
+        self.assertEqual(response.status_code, HTTPStatus.FOUND)
+
+
+class UpdateTaskViewTestCase(TestCase):
+    test_uuid = "21fb4127-c9e6-4040-8684-dceeeb8eb816"
+    view_url = f"/tasks/update/{test_uuid}/"
+    view_name = "tasks_update"
+    template = "tasks_form.html"
+
+    def test_view_url(self):
+        response = self.client.get(self.view_url)
+        self.assertNotEqual(response.status_code, HTTPStatus.NOT_FOUND)
+        self.assertIs(response.resolver_match.func.view_class, UpdateTask)
+
+    def test_view_name(self):
+        url = reverse(self.view_name, args=[self.test_uuid])
+        response = self.client.get(url)
+        self.assertNotEqual(response.status_code, HTTPStatus.NOT_FOUND)
+        self.assertIs(response.resolver_match.func.view_class, UpdateTask)
 
     def test_login_required(self):
         response = self.client.get(self.view_url)

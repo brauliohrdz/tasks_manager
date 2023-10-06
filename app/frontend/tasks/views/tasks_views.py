@@ -67,8 +67,4 @@ class UpdateTask(LoginRequiredMixin, View):
             )
             messages.success(request, "La tarea se ha creado correctamente")
             return HttpResponseRedirect(reverse("tasks_list"))
-        return render(
-            request,
-            self.template_name,
-            {"form": form},
-        )
+        return render(request, self.template_name, {"form": form})
