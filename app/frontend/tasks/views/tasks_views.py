@@ -93,7 +93,7 @@ class UpdateTask(LoginRequiredMixin, View):
 
 
 class DeleteTask(LoginRequiredMixin, View):
-    def delete(self, request, task_uuid):
+    def get(self, request, task_uuid):
         try:
             delete_task(task_uuid, owner_id=request.user.id)
             messages.success(request, "La tarea se ha eliminado correctamente.")
