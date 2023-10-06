@@ -5,6 +5,7 @@ from backend.tasks.services import (
     list_tasks_for_user,
     update_task,
 )
+from backend.tasks.services.task_services import delete_task
 from django import forms
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -67,8 +68,6 @@ class UpdateTask(LoginRequiredMixin, View):
 
     def get(self, request, task_uuid):
         try:
-            task = get_task_for_owner(task_uuid, owner_id=request.user.id)
-            form = TaskForm(model_to_dict(task))
             return render(request, self.template_name, {"form": form})
         except ObjectDoesNotExist:
             return HttpResponseNotFound("No se ha encontrado la tarea indicada")
@@ -85,6 +84,17 @@ class UpdateTask(LoginRequiredMixin, View):
                 messages.success(request, "La tarea se ha creado correctamente")
                 return HttpResponseRedirect(reverse("tasks_list"))
             return render(request, self.template_name, {"form": form})
+        except ObjectDoesNotExist:
+            return HttpResponseNotFound("No se ha encontrado la tarea indicada")
+        except PermissionError:
+            return HttpResponseForbidden("No tiene permisos para realizar esta acción")
+
+
+class DeleteTask(LoginRequiredMixin, View):
+    def get(self, request, task_uuid):
+        try:
+            delete_task(task_uuid, owner_id=request.user.id)
+            return HttpResponseRedirect(reverse("tasks_list"))
         except ObjectDoesNotExist:
             return HttpResponseNotFound("No se ha encontrado la tarea indicada")
         except PermissionError:

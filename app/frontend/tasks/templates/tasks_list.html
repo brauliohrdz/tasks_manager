@@ -12,7 +12,8 @@
         {% for task in tasks %}
         <li> <strong>{{ task.title }} </strong> <br>
             {{ task.description }} <br><small> {{ task.status }} {{ task.created }} </small>
-            <br><a href="{% url "tasks_update" task.uuid %}">Editar</a>
+            <br><a href="{% url "tasks_update" task.uuid %}">Modificar</a>
+            <a href="{% url "tasks_delete" task.uuid %}">Eliminar</a>
         </li>
         {% empty %}
 
