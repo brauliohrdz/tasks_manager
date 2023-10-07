@@ -1,7 +1,7 @@
 from api.tasks.views import CreateTaskImage, DeleteTaskImage
 from backend.tasks.tests.utils import TaskImageTestUtils, TaskTestUtils
+from backend.users.tests.utils import UserTestUtils
 from django.conf import settings
-from django.contrib.auth.models import User
 from rest_framework import status
 from rest_framework.test import APITestCase
 
@@ -21,7 +21,7 @@ class DeleteTaskImageTestCase(APITestCase):
 
     @classmethod
     def setUpTestData(cls) -> None:
-        cls.user = User.objects.create(username="admin", email="admin@example.com")
+        cls.user = UserTestUtils.create(username="admin", email="admin@example.com")
 
     def test_view_url(self):
         response = self.client.delete(self.endpoint_url)
@@ -73,7 +73,7 @@ class CreateTaskImageTestCase(APITestCase):
 
     @classmethod
     def setUpTestData(cls) -> None:
-        cls.user = User.objects.create(username="admin", email="admin@example.com")
+        cls.user = UserTestUtils.create(username="admin", email="admin@example.com")
 
     @property
     def endpoint_url(self):

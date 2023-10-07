@@ -3,7 +3,7 @@ from backend.tasks.services import (
     delete_task_image,
     get_task_image_for_owner,
 )
-from django.contrib.auth.models import User
+from backend.users.tests.utils import UserTestUtils
 from django.core.exceptions import ObjectDoesNotExist
 from django.test import TestCase
 
@@ -15,7 +15,7 @@ class BaseTaskImageTestCase(TestCase):
 
     @classmethod
     def setUpTestData(cls) -> None:
-        cls.user = User.objects.create(username="homerjay@example.com")
+        cls.user = UserTestUtils.create(username="homerjay@example.com")
         cls.task = TaskTestUtils.create(title="Mi task", owner_id=cls.user.id)
         cls.task_image = TaskImageTestUtils.create(task_id=cls.task.id)
         return super().setUpTestData()

@@ -14,8 +14,8 @@ from rest_framework.views import APIView
 
 
 class TasksList(APIView):
-    # authentication_classes = [TokenAuthentication]
-    # permission_classes = [IsAuthenticated]
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
 
     class TasksListSerializer(serializers.Serializer):
         uuid = serializers.UUIDField()

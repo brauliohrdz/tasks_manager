@@ -1,7 +1,8 @@
 from api.tasks.views import CreateTask, DeleteTask, TasksList, UpdateTask
 from backend.tasks.tests.utils import TaskTestUtils
-from django.contrib.auth.models import User
+from backend.users.tests.utils import UserTestUtils
 from django.core.exceptions import ObjectDoesNotExist
+from django.http import QueryDict
 from django.utils import timezone
 from freezegun import freeze_time
 from mock import patch
@@ -24,7 +25,7 @@ class DeleteTaskTestCase(APITestCase):
 
     @classmethod
     def setUpTestData(cls) -> None:
-        cls.user = User.objects.create(username="admin", email="admin@example.com")
+        cls.user = UserTestUtils.create(username="admin", email="admin@example.com")
 
     def test_view_url(self):
         response = self.client.delete(self.endpoint_url)
@@ -96,7 +97,7 @@ class UpdateTaskTestCase(APITestCase):
 
     @classmethod
     def setUpTestData(cls) -> None:
-        cls.user = User.objects.create(username="admin", email="admin@example.com")
+        cls.user = UserTestUtils.create(username="admin", email="admin@example.com")
 
     @property
     def endpoint_url(self):
@@ -234,7 +235,7 @@ class CreateTaskTestCase(APITestCase):
 
     @classmethod
     def setUpTestData(cls) -> None:
-        cls.user = User.objects.create(username="admin", email="admin@example.com")
+        cls.user = UserTestUtils.create(username="admin", email="admin@example.com")
 
     def test_view_url(self):
         self.client.force_authenticate(self.user)
@@ -334,7 +335,7 @@ class TasksListViewTestCase(APITestCase):
 
     @classmethod
     def setUpTestData(cls) -> None:
-        cls.user = User.objects.create(username="admin", email="admin@example.com")
+        cls.user = UserTestUtils.create(username="admin", email="admin@example.com")
 
     @property
     def service_mock_data(self):
@@ -406,7 +407,7 @@ class TasksListViewTestCase(APITestCase):
     def test_tasks_list_service_call(self, mock_service):
         self.client.force_authenticate(self.user)
         self.client.get(self.endpoint_url)
-        mock_service.assert_called_once_with(id=self.user.id)
+        mock_service.assert_called_once_with(id=self.user.id, query_params=QueryDict())
 
     @patch("api.tasks.views.tasks_api.list_tasks_for_user")
     def test_tasks_list(self, mock_service):

@@ -4,7 +4,7 @@ from backend.tasks.services import (
     list_tasks_for_user,
     update_task,
 )
-from django.contrib.auth.models import User
+from backend.users.tests.utils import UserTestUtils
 from django.core.exceptions import FieldError, ObjectDoesNotExist, ValidationError
 from django.db.models import QuerySet
 from django.test import TestCase
@@ -18,7 +18,7 @@ class BaseTaskTestCase(TestCase):
 
     @classmethod
     def setUpTestData(cls) -> None:
-        cls.user = User.objects.create(username="homerjay@example.com")
+        cls.user = UserTestUtils.create(username="homerjay@example.com")
         return super().setUpTestData()
 
 
@@ -160,7 +160,7 @@ class ListTasksForUserTestCase(BaseTaskTestCase):
             list_tasks_for_user(id="")
 
     def test_service_list_user_tasks_only(self):
-        another_user = User.objects.create(username="nedflanders@example.com")
+        another_user = UserTestUtils.create(username="nedflanders@example.com")
         TaskTestUtils.create(id=1, title="No listable task", owner_id=another_user.id)
         TaskTestUtils.create(id=2, title="Homer task1", owner_id=self.user.id)
         TaskTestUtils.create(id=3, title="Homer task2", owner_id=self.user.id)
