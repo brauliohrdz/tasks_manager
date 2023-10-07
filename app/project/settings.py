@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "storages",
     "rest_framework",
     "rest_framework.authtoken",
     "django_filters",
@@ -171,3 +172,22 @@ if "test" in sys.argv or "test_coverage" in sys.argv:
     DEBUG = True
     ALLOWED_HOSTS = ["*"]
     UPLOAD_IMAGES_PATH = "test/images/"
+
+
+USE_S3 = env("USE_S3")
+
+## Media files en AWS
+if USE_S3:
+    SECONDS_IN_24_HOURS = 86400
+
+    AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID")
+    AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
+    AWS_STORAGE_BUCKET_NAME = os.getenv("AWS_STORAGE_BUCKET_NAME")
+    AWS_DEFAULT_ACL = None
+    AWS_S3_REGION = "eu-west-3"
+    AWS_S3_CUSTOM_DOMAIN = f"{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com"
+    AWS_S3_HOST = "s3.{}.amazonaws.com".format(AWS_S3_REGION)
+    AWS_S3_OBJECT_PARAMETERS = {"CacheControl": f"max-age={SECONDS_IN_24_HOURS}"}
+    PUBLIC_MEDIA_LOCATION = "media"
+    MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/{PUBLIC_MEDIA_LOCATION}/"
+    DEFAULT_FILE_STORAGE = "project.files_storage.MediaStorage"
