@@ -10,6 +10,7 @@ from django import forms
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import ObjectDoesNotExist
+from django.core.paginator import Paginator
 from django.forms.models import model_to_dict
 from django.http import (
     HttpResponseBadRequest,
@@ -37,10 +38,16 @@ class TaskForm(forms.Form):
 
 class TasksList(LoginRequiredMixin, View):
     template_name = "tasks_list.html"
+    PAGE_SIZE = 2
+
+    def paginate_response(self, tasks, page):
+        paginator = Paginator(tasks, self.PAGE_SIZE)
+        return paginator.page(page)
 
     def get(self, request):
         tasks = list_tasks_for_user(id=request.user.id)
-        return render(request, self.template_name, {"tasks": tasks})
+        tasks_page = self.paginate_response(tasks, request.GET.get("page", 1))
+        return render(request, self.template_name, {"page": tasks_page})
 
 
 class CreateTask(LoginRequiredMixin, View):

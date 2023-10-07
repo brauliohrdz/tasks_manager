@@ -9,7 +9,7 @@
 </div>
 <div>
     <ul>
-        {% for task in tasks %}
+        {% for task in page %}
         <li> <strong>{{ task.title }} </strong> <br>
             {{ task.description }} <br><small> {{ task.status }} {{ task.created }} </small>
             <br><a href="{% url "tasks_update" task.uuid %}">Modificar</a>
@@ -21,4 +21,20 @@
         {% endfor %}
     </ul>
 </div>
+
+<div class="pagination">
+    {% if page.has_previous %}
+      <a href="?page=1">Primera</a>
+      <a href="?page={{ page.previous_page_number }}">Anterior</a>
+    {% endif %}
+  
+    <span class="current">
+      Página {{ page.number }} de {{ page.paginator.num_pages }}.
+    </span>
+  
+    {% if page.has_next %}
+      <a href="?page={{ page.next_page_number }}">Siguiente</a>
+      <a href="?page={{ page.paginator.num_pages }}">Última</a>
+    {% endif %}
+  </div>
 {% endblock %}
