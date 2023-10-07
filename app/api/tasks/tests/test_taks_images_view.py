@@ -60,7 +60,7 @@ class DeleteTaskImageTestCase(APITestCase):
         task = TaskTestUtils.create(
             uuid=self.TEST_UUID, title="Task to delete", owner_id=self.user.id
         )
-        task_image = TaskImageTestUtils.create(uuid=self.TEST_UUID, task_id=task.id)
+        TaskImageTestUtils.create(uuid=self.TEST_UUID, task_id=task.id)
         self.client.force_authenticate(self.user)
         response = self.client.delete(self.endpoint_url)
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
@@ -135,7 +135,5 @@ class CreateTaskImageTestCase(APITestCase):
         self.assertEqual(
             task_image.image.read(), TaskImageTestUtils.simple_uploaded_image().read()
         )
-        expected_url = (
-            f"{settings.MEDIA_URL}{settings.UPLOAD_IMAGES_PATH}{task_image.uuid}.jpeg"
-        )
+        expected_url = f"{settings.MEDIA_URL}{settings.UPLOAD_IMAGES_PATH}{task.uuid}/{task_image.uuid}.jpeg"
         self.assertEqual(response.json().get("image"), expected_url)

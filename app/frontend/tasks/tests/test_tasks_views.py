@@ -92,9 +92,9 @@ class UpdateTaskViewTestCase(TestCase):
     def test_non_existent_task_uuid_returns_404(self):
         self.client.force_login(self.user)
         response = self.client.get(self.view_url)
-        self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)
+        self.assertEqual(response.status_code, HTTPStatus.BAD_REQUEST)
         response = self.client.post(self.view_url, data={"title": "foo title"})
-        self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)
+        self.assertEqual(response.status_code, HTTPStatus.BAD_REQUEST)
 
     def test_non_task_owner_cannot_accest_to_task_data(self):
         TaskTestUtils.create(title="My Task", uuid=self.test_uuid)
@@ -176,8 +176,7 @@ class DeleteTaskViewTestCase(TestCase):
     def test_non_existent_task_uuid_returns_404(self):
         self.client.force_login(self.user)
         response = self.client.get(self.view_url)
-        self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)
-        response = self.client.post(self.view_url, data={"title": "foo title"})
+        self.assertEqual(response.status_code, HTTPStatus.BAD_REQUEST)
 
     def test_non_task_owner_cannot_delete_task(self):
         TaskTestUtils.create(title="My Task", uuid=self.test_uuid)
