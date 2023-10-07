@@ -14,20 +14,53 @@
         <button type="submit">Guardar</button>
     </form>
     {% if task %}
-    <form method="post" action="{% url "tasks_image_create" task.uuid %}" enctype="multipart/form-data">
+    <form method="post" action="{% url 'tasks_image_create' task.uuid %}" enctype="multipart/form-data">
         {% csrf_token %}
         <label for="image">Selecciona una imagen:</label>
         <input type="file" id="image" name="image" accept="image/*" required>
         <button type="submit">Subir imagen</button>
     </form>
     
-    <div>
+    <div id="task_images">
         {% for image in task.images.all %}
-        <img src="{{image.image.url}}" with="100" height="100">
+        <div style="max-widh:100px; overflow:hidden" class="image-card">
+            <img src="{{image.image.url}}" with="100" height="100">
+            <a href="{% url 'tasks_image_delete' image.uuid %}" class="delete-link">Eliminar</a>
+        </div>
         {% empty%}
         <small> Sin imágenes para mostrar </small>
         {% endfor %}
     </div>
+    <script>
+        const imagesContainer = document.getElementById('task_images');
+        imagesContainer.addEventListener('click', function(event) {
+            if (event.target.classList.contains('delete-link')) {
+                event.preventDefault();
+                
+                if (confirm('¿Estás seguro de que deseas eliminar este elemento?')) {
+                    var deleteUrl = event.target.getAttribute('href');
+                    
+                    fetch(deleteUrl, {
+                        method: 'GET',
+                        headers: {
+                            //'Content-Type': 'application/json',
+                            //'X-CSRFToken': 'tu_token_de_csrf'
+                        },
+                    })
+                    .then(response => {
+                        if (response.status === 200) {
+                            event.target.closest("div").remove()
+                        } else {
+                            alert('Error al eliminar el elemento.');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+                }
+            }
+        });
+    </script>
     
     {% endif %}
 </div>

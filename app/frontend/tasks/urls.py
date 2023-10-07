@@ -3,6 +3,7 @@ from frontend.tasks.views import (
     CreateTask,
     CreateTaskImage,
     DeleteTask,
+    DeleteTaskImage,
     TasksList,
     UpdateTask,
 )
@@ -10,6 +11,11 @@ from frontend.tasks.views import (
 images_patterns = [
     path(
         "create/<uuid:task_uuid>/", CreateTaskImage.as_view(), name="tasks_image_create"
+    ),
+    path(
+        "delete/<uuid:task_image_uuid>/",
+        DeleteTaskImage.as_view(),
+        name="tasks_image_delete",
     ),
 ]
 

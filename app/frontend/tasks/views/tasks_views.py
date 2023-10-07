@@ -96,7 +96,6 @@ class DeleteTask(LoginRequiredMixin, View):
     def get(self, request, task_uuid):
         try:
             delete_task(task_uuid, owner_id=request.user.id)
-            messages.success(request, "La tarea se ha eliminado correctamente.")
             return HttpResponseRedirect(reverse("tasks_list"))
         except ObjectDoesNotExist:
             return HttpResponseNotFound("No se ha encontrado la tarea indicada")
