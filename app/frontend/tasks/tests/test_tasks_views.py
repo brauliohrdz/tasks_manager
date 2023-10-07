@@ -36,7 +36,7 @@ class TasksListViewTestCase(TestCase):
         self.client.force_login(user)
         response = self.client.get(self.view_url)
         self.assertEqual(response.status_code, HTTPStatus.OK)
-        tasks = response.context.get("tasks")
+        tasks = response.context.get("page")
         tasks_titles = [task.title for task in tasks]
         self.assertEqual(len(tasks_titles), 2)
         self.assertListEqual(["my_task_1", "my_task_2"], tasks_titles)

@@ -25,7 +25,7 @@ class TasksList(APIView):
         status = serializers.CharField()
 
     def get(self, request):
-        tasks = list_tasks_for_user(id=1)
+        tasks = list_tasks_for_user(id=request.user.id)
         paginator = PageNumberPagination()
         paginated_tasks = paginator.paginate_queryset(tasks, request)
         return paginator.get_paginated_response(

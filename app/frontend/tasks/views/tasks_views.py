@@ -7,6 +7,7 @@ from backend.tasks.services import (
 )
 from backend.tasks.services.task_services import delete_task
 from django import forms
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import ObjectDoesNotExist
@@ -38,10 +39,9 @@ class TaskForm(forms.Form):
 
 class TasksList(LoginRequiredMixin, View):
     template_name = "tasks_list.html"
-    PAGE_SIZE = 2
 
     def paginate_response(self, tasks, page):
-        paginator = Paginator(tasks, self.PAGE_SIZE)
+        paginator = Paginator(tasks, settings.PAGINATION_PAGE_SIZE)
         return paginator.page(page)
 
     def get(self, request):
