@@ -37,7 +37,7 @@ class TaskImage(models.Model):
     def image_name(self, filename):
         extension = filename.split(".")[-1]
         task_folder = str(self.task.uuid)
-        image_filename = f"{self.uuid}-{extension}"
+        image_filename = f"{self.uuid}.{extension}"
         return os.path.join(settings.UPLOAD_IMAGES_PATH, task_folder, image_filename)
 
     uuid = models.UUIDField(unique=True, default=uuid4, editable=False)
