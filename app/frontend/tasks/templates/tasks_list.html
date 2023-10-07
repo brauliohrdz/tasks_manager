@@ -21,12 +21,12 @@
     <a href="{% url "tasks_create" %}">Añadir Tarea</a>
 </div>
 <div>
-    <ul>
+    <ul id="tasks_list">
         {% for task in page %}
         <li> <strong>{{ task.title }} </strong> <br>
             {{ task.description }} <br><small> {{ task.status }} {{ task.created }} </small>
             <br><a href="{% url "tasks_update" task.uuid %}">Modificar</a>
-            <a href="{% url "tasks_delete" task.uuid %}">Eliminar</a>
+            <a href="{% url "tasks_delete" task.uuid %}" class="delete_link">Eliminar</a>
         </li>
         {% empty %}
 
@@ -50,4 +50,37 @@
       <a href="?page={{ page.paginator.num_pages }}">Última</a>
     {% endif %}
   </div>
+
+  {% csrf_token %}
+  <script>
+    const imagesContainer = document.getElementById('tasks_list');
+    const csrfToken = document.querySelector("[name='csrfmiddlewaretoken']").getAttribute("value")
+    imagesContainer.addEventListener('click', function(event) {
+        if (event.target.classList.contains('delete_link')) {
+            event.preventDefault();
+            
+            if (confirm('¿Estás seguro de que deseas eliminar este elemento?')) {
+                var deleteUrl = event.target.getAttribute('href');
+                
+                fetch(deleteUrl, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrfToken
+                    },
+                })
+                .then(response => {
+                    if (response.status === 200) {
+                        event.target.closest("li").remove()
+                    } else {
+                        alert('Error al eliminar el elemento.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+            }
+        }
+    });
+</script>
 {% endblock %}

@@ -17,6 +17,7 @@ from django.http import (
     HttpResponseBadRequest,
     HttpResponseForbidden,
     HttpResponseRedirect,
+    JsonResponse,
 )
 from django.shortcuts import render
 from django.urls import reverse
@@ -100,10 +101,10 @@ class UpdateTask(LoginRequiredMixin, View):
 
 
 class DeleteTask(LoginRequiredMixin, View):
-    def get(self, request, task_uuid):
+    def delete(self, request, task_uuid):
         try:
             delete_task(task_uuid, owner_id=request.user.id)
-            return HttpResponseRedirect(reverse("tasks_list"))
+            return JsonResponse(data={})
         except ObjectDoesNotExist:
             return HttpResponseBadRequest("No se ha encontrado la tarea indicada")
         except PermissionError:
