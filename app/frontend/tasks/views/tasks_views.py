@@ -12,8 +12,8 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import ObjectDoesNotExist
 from django.forms.models import model_to_dict
 from django.http import (
+    HttpResponseBadRequest,
     HttpResponseForbidden,
-    HttpResponseNotFound,
     HttpResponseRedirect,
 )
 from django.shortcuts import render
@@ -72,7 +72,7 @@ class UpdateTask(LoginRequiredMixin, View):
             form = TaskForm(model_to_dict(task))
             return render(request, self.template_name, {"form": form, "task": task})
         except ObjectDoesNotExist:
-            return HttpResponseNotFound("No se ha encontrado la tarea indicada")
+            return HttpResponseBadRequest("No se ha encontrado la tarea indicada")
         except PermissionError:
             return HttpResponseForbidden("No tiene permisos para realizar esta acción")
 
@@ -87,7 +87,7 @@ class UpdateTask(LoginRequiredMixin, View):
                 return HttpResponseRedirect(reverse("tasks_list"))
             return render(request, self.template_name, {"form": form})
         except ObjectDoesNotExist:
-            return HttpResponseNotFound("No se ha encontrado la tarea indicada")
+            return HttpResponseBadRequest("No se ha encontrado la tarea indicada")
         except PermissionError:
             return HttpResponseForbidden("No tiene permisos para realizar esta acción")
 
@@ -98,6 +98,6 @@ class DeleteTask(LoginRequiredMixin, View):
             delete_task(task_uuid, owner_id=request.user.id)
             return HttpResponseRedirect(reverse("tasks_list"))
         except ObjectDoesNotExist:
-            return HttpResponseNotFound("No se ha encontrado la tarea indicada")
+            return HttpResponseBadRequest("No se ha encontrado la tarea indicada")
         except PermissionError:
             return HttpResponseForbidden("No tiene permisos para realizar esta acción")
