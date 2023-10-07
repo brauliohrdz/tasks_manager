@@ -161,8 +161,8 @@ REST_FRAMEWORK = {
     "PAGE_SIZE": PAGINATION_PAGE_SIZE,
 }
 
-LOGIN_URL = "/login/"
-LOGIN_REDIRECT_URL = "/tasks/"
+LOGIN_URL = "/accounts/login/"
+LOGIN_REDIRECT_URL = "/"
 
 # Settings for tests
 if "test" in sys.argv or "test_coverage" in sys.argv:

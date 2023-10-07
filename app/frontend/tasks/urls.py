@@ -19,10 +19,14 @@ images_patterns = [
     ),
 ]
 
-urlpatterns = [
-    path("", TasksList.as_view(), name="tasks_list"),
+tasks_patterns = [
     path("create/", CreateTask.as_view(), name="tasks_create"),
     path("update/<uuid:task_uuid>/", UpdateTask.as_view(), name="tasks_update"),
     path("delete/<uuid:task_uuid>/", DeleteTask.as_view(), name="tasks_delete"),
+]
+
+urlpatterns = [
+    path("", TasksList.as_view(), name="tasks_list"),
+    path("tasks/", include(tasks_patterns)),
     path("images/", include(images_patterns)),
 ]

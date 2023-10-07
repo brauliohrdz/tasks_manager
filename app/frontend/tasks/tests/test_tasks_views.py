@@ -8,7 +8,7 @@ from frontend.tasks.views import CreateTask, DeleteTask, TasksList, UpdateTask
 
 
 class TasksListViewTestCase(TestCase):
-    view_url = "/tasks/"
+    view_url = "/"
     view_name = "tasks_list"
     template = "tasks_list.html"
 
