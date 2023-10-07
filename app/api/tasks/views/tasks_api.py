@@ -14,8 +14,8 @@ from rest_framework.views import APIView
 
 
 class TasksList(APIView):
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated]
+    # authentication_classes = [TokenAuthentication]
+    # permission_classes = [IsAuthenticated]
 
     class TasksListSerializer(serializers.Serializer):
         uuid = serializers.UUIDField()
@@ -25,7 +25,7 @@ class TasksList(APIView):
         status = serializers.CharField()
 
     def get(self, request):
-        tasks = list_tasks_for_user(id=request.user.id)
+        tasks = list_tasks_for_user(id=request.user.id, query_params=request.GET)
         paginator = PageNumberPagination()
         paginated_tasks = paginator.paginate_queryset(tasks, request)
         return paginator.get_paginated_response(
