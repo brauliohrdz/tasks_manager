@@ -389,7 +389,7 @@ class TasksListViewTestCase(APITestCase):
         self.client.force_authenticate(self.user)
         response = self.client.get(self.endpoint_url)
 
-        response_data = response.json()
+        response_data = response.json().get("results")
         self.assertIs(type(response_data), list)
         response_task_item_keys = list(response_data[0].keys())
         tasks_list_expected_item_keys = [
@@ -415,7 +415,7 @@ class TasksListViewTestCase(APITestCase):
         self.client.force_authenticate(self.user)
         response = self.client.get(self.endpoint_url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertListEqual(response.json(), self.service_mock_data)
+        self.assertListEqual(response.json().get("results"), self.service_mock_data)
 
     @freeze_time("2022-01-01 12:00:00")
     def test_integration_with_service(self):
@@ -447,7 +447,7 @@ class TasksListViewTestCase(APITestCase):
                 "status": "",
             },
         ]
-        retrieved_tasks = response.json()
+        retrieved_tasks = response.json().get("results")
         self.assertEqual(len(retrieved_tasks), len(retrieved_tasks))
         for retrieved_task_data, expected_task_data in zip(
             retrieved_tasks, expected_tasks

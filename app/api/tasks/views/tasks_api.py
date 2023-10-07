@@ -7,6 +7,7 @@ from backend.tasks.services import (
 from django.core.exceptions import ObjectDoesNotExist
 from rest_framework import serializers, status
 from rest_framework.authentication import TokenAuthentication
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -24,10 +25,11 @@ class TasksList(APIView):
         status = serializers.CharField()
 
     def get(self, request):
-        tasks_data = list_tasks_for_user(id=request.user.id)
-        return Response(
-            self.TasksListSerializer(tasks_data, many=True).data,
-            status=status.HTTP_200_OK,
+        tasks = list_tasks_for_user(id=1)
+        paginator = PageNumberPagination()
+        paginated_tasks = paginator.paginate_queryset(tasks, request)
+        return paginator.get_paginated_response(
+            self.TasksListSerializer(paginated_tasks, many=True).data,
         )
 
 

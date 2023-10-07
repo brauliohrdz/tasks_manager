@@ -149,8 +149,14 @@ UPLOAD_IMAGES_PATH = "images/"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+
+PAGINATION_PAGE_SIZE = 10
+
+
 REST_FRAMEWORK = {
     "DATETIME_FORMAT": "%d-%m-%Y %H:%M:%S",
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
+    "PAGE_SIZE": PAGINATION_PAGE_SIZE,
 }
 
 LOGIN_URL = "/login/"
