@@ -45,7 +45,7 @@ class TasksList(LoginRequiredMixin, View):
         return paginator.page(page)
 
     def get(self, request):
-        tasks = list_tasks_for_user(id=request.user.id)
+        tasks = list_tasks_for_user(id=request.user.id, query_params=request.GET)
         tasks_page = self.paginate_response(tasks, request.GET.get("page", 1))
         return render(request, self.template_name, {"page": tasks_page})
 

@@ -4,6 +4,19 @@
 {% block title %} Mis Tareas {% endblock %}
 
 {% block main %} 
+
+<form action="" method="get">
+  <input type="text" name="title" value="{{ request.GET.title }}" placeholder="Titulo de la tarea">
+  <select name="status">
+    <option></option>
+    <option value="pending">Pendiente</option>
+    <option value="in_progress">En progreso</option>
+    <option value="completed">Completada</option>
+  </select>
+  <input type="submit" value="Buscar">
+  <input type="reset" value="Reset">
+</form>
+
 <div>
     <a href="{% url "tasks_create" %}">Añadir Tarea</a>
 </div>

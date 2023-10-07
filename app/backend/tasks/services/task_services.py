@@ -1,6 +1,10 @@
+from typing import Optional
+
 from backend.tasks.models import Task
 from django.core.exceptions import FieldError
 from django.db.models import QuerySet
+
+from .filters import TasksListFilter
 
 
 def get_task_for_owner(task_uuid: str, owner_id: int):
@@ -11,9 +15,12 @@ def get_task_for_owner(task_uuid: str, owner_id: int):
     raise PermissionError("User is not task owner.")
 
 
-def list_tasks_for_user(id: int) -> QuerySet[Task]:
+def list_tasks_for_user(id: int, query_params: Optional[dict] = None) -> QuerySet[Task]:
     assert id, "User id is required."
-    return Task.objects.filter(owner_id=id).prefetch_related("images")
+    tasks = Task.objects.filter(owner_id=id)
+    if query_params:
+        tasks = TasksListFilter(query_params, tasks).qs
+    return tasks
 
 
 def create_task(owner_id: int, **kwargs) -> Task:
