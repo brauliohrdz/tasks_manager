@@ -59,7 +59,7 @@ class DeleteTaskTestCase(APITestCase):
         response = self.client.delete(self.endpoint_url)
         self.assertEqual(response["Content-Type"], "application/json")
 
-    @patch("api.tasks.views.tasks_views.delete_task")
+    @patch("api.tasks.views.tasks_api.delete_task")
     def test_delet_task_service_call(self, mock_delete_task):
         self.client.force_authenticate(self.user)
         self.client.delete(self.endpoint_url)
@@ -68,13 +68,13 @@ class DeleteTaskTestCase(APITestCase):
             task_uuid=self.TEST_UUID, owner_id=self.user.id
         )
 
-    @patch("api.tasks.views.tasks_views.delete_task", side_effect=ObjectDoesNotExist)
+    @patch("api.tasks.views.tasks_api.delete_task", side_effect=ObjectDoesNotExist)
     def test_not_valid_uuid_returns_400(self, mock_delete_task):
         self.client.force_authenticate(self.user)
         response = self.client.delete(self.endpoint_url)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-    @patch("api.tasks.views.tasks_views.delete_task", side_effect=PermissionError)
+    @patch("api.tasks.views.tasks_api.delete_task", side_effect=PermissionError)
     def test_owner_without_permission_returns_400(self, mock_delete_task):
         self.client.force_authenticate(self.user)
         response = self.client.delete(self.endpoint_url)
@@ -165,7 +165,7 @@ class UpdateTaskTestCase(APITestCase):
         expected_error_msg = "Este campo es requerido."
         self.assertEqual(error.get("status")[0], expected_error_msg)
 
-    @patch("api.tasks.views.tasks_views.update_task")
+    @patch("api.tasks.views.tasks_api.update_task")
     def test_update_task_service_call(self, update_task_service_mock):
         expires_date = timezone.datetime(2099, 12, 31, 23, 59, 59)
 
@@ -184,7 +184,7 @@ class UpdateTaskTestCase(APITestCase):
             task_uuid=self.TEST_UUID, owner_id=self.user.id, **update_data
         )
 
-    @patch("api.tasks.views.tasks_views.update_task", side_effect=ObjectDoesNotExist)
+    @patch("api.tasks.views.tasks_api.update_task", side_effect=ObjectDoesNotExist)
     def test_unexistent_uuid_returns_400(self, update_task_service_mock):
         update_data = {
             "title": "My updated title",
@@ -196,7 +196,7 @@ class UpdateTaskTestCase(APITestCase):
         response = self.client.put(self.endpoint_url, data=update_data)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-    @patch("api.tasks.views.tasks_views.update_task", side_effect=PermissionError)
+    @patch("api.tasks.views.tasks_api.update_task", side_effect=PermissionError)
     def test_unautorized_user_gets_400(self, update_task_service_mock):
         update_data = {
             "title": "My updated title",
@@ -297,7 +297,7 @@ class CreateTaskTestCase(APITestCase):
         expected_error_msg = "Este campo es requerido."
         self.assertEqual(error.get("status")[0], expected_error_msg)
 
-    @patch("api.tasks.views.tasks_views.create_task")
+    @patch("api.tasks.views.tasks_api.create_task")
     def test_create_task_service_call(self, mock_create_task):
         expires_date = timezone.datetime(2099, 12, 31, 23, 59, 59)
 
@@ -382,7 +382,7 @@ class TasksListViewTestCase(APITestCase):
         response = self.client.get(self.endpoint_url)
         self.assertEqual(response["Content-Type"], "application/json")
 
-    @patch("api.tasks.views.tasks_views.list_tasks_for_user")
+    @patch("api.tasks.views.tasks_api.list_tasks_for_user")
     def test_response_has_expected_structure(self, mock_service):
         mock_service.return_value = self.service_mock_data
 
@@ -402,13 +402,13 @@ class TasksListViewTestCase(APITestCase):
 
         self.assertListEqual(tasks_list_expected_item_keys, response_task_item_keys)
 
-    @patch("api.tasks.views.tasks_views.list_tasks_for_user")
+    @patch("api.tasks.views.tasks_api.list_tasks_for_user")
     def test_tasks_list_service_call(self, mock_service):
         self.client.force_authenticate(self.user)
         self.client.get(self.endpoint_url)
         mock_service.assert_called_once_with(id=self.user.id)
 
-    @patch("api.tasks.views.tasks_views.list_tasks_for_user")
+    @patch("api.tasks.views.tasks_api.list_tasks_for_user")
     def test_tasks_list(self, mock_service):
         mock_service.return_value = self.service_mock_data
 
