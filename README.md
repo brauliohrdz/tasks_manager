@@ -134,70 +134,7 @@ El acceso a la interfaz web se realiza mediante http://localhost:9000  con el co
 
 ### Documentación de la API 
 
-La documentación de la api y los ejemplos de acceso a los diferentes endpoints se encuentan en el archivo /scripts/endpoints_demo.py
-
-
-
-
-##### Listado de Tareas  -  `GET /api/v1/tasks/list`
-
-*Descripción*: Este endpoint devuelve la lista de tareas existentes.
-
-*Datos de Entrada:*  No requiere datos de entrada.
-
-*Respuesta:*  200-OK -  Devuelve una lista de tareas en formato JSON. 
-
-```json
-[
-{'uuid': 'uuid de la tarea', 
- 'title': 'título de la tarea', 
- 'created': '07-10-2023 23:32:50', 
- 'expires': '07-10-2023', 
- 'status': 'pending'
-},]
- 
-```
-
-#### Crear Tarea: `POST /api/v1/tasks/create`
-
-*Descripción*: Crea una nueva tarea con los datos proporcionados.
-
-*Datos de Entrada*:
-
-- `title` (str): Título de la tarea.
-- `description` (str): Descripción de la tarea.
-- `expires` (str): Fecha de vencimiento de la tarea en formato YYYY-MM-DD.
-- `status` (str): Estado de la tarea (por ejemplo, "pendiente" o "completada").
-
-*Respuesta*:  201- CREATED  
-
-
-
-##### Actualizar Tarea  `PUT /api/v1/tasks/update/{task_uuid}`
-
-*Descripción*: Actualiza los detalles de una tarea existente identificada por su `task_uuid`.
-
-*Datos de Entrada*:
-
-- `task_uuid` (str): UUID único de la tarea que se desea actualizar (va en la url).
-- `title` (str): Nuevo título de la tarea.
-- `description` (str): Nueva descripción de la tarea.
-- `expires` (str): Nueva fecha de vencimiento de la tarea en formato YYYY-MM-DD.
-- `status` (str): Nuevo estado de la tarea.
-
-*Respuesta:*  204- No Content
-
-
-
-##### Eliminar Tarea  `DELETE /api/v1/tasks/delete/{task_uuid}`
-
-*Descripción*: Elimina una tarea existente identificada por su `task_uuid`.
-
-*Datos de Entrada*:
-
-- `task_uuid` (str): UUID único de la tarea que se desea eliminar.
-
-*Respuesta*: Devuelve un mensaje de éxito si la tarea ha sido eliminada correctamente.
+La documentación de la api  se encuentra en el archivo API_DOC.md de éste mismo proyecto y un conjunto de funciones python preparados para consumir dicha api pueden consultarse en *scripts/endpoints.py*
 
 
 
