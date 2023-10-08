@@ -1,0 +1,15 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-light pr-3 bg-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="/">Simple Task Manager</a>
+      </div>
+    {% if request.user.is_authenticated %}
+    <ul class="navbar-nav">
+    <li class="nav-item">
+        <a class="nav-link d-flex" href="/" ><ion-icon name="home-outline" class="pt-1"></ion-icon> Tareas  </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link d-flex" href="{% url 'logout' %}" ><ion-icon name="log-out-outline" class="pt-1"></ion-icon> Salir  </a>
+      </li>
+    </ul>
+    {% endif %}
+</nav>
