@@ -449,7 +449,6 @@ class TasksListViewTestCase(APITestCase):
             },
         ]
         retrieved_tasks = response.json().get("results")
-        self.assertEqual(len(retrieved_tasks), len(retrieved_tasks))
         for retrieved_task_data, expected_task_data in zip(
             retrieved_tasks, expected_tasks
         ):
