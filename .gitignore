@@ -17,3 +17,4 @@ db.sqlite3
 
 # Ignorar archivos de media subidos por los usuarios (si los almacenas localmente)
 media/
+staticfiles/

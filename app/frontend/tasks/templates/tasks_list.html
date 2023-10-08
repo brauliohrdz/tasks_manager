@@ -18,7 +18,7 @@
     </div>
    {% include "tasks_list/pagination.html" %}
    {% csrf_token %}
-    <script>
+    {% comment %} <script>
         const imagesContainer = document.getElementById('tasks_list');
         const csrfToken = document.querySelector("[name='csrfmiddlewaretoken']").getAttribute("value")
         imagesContainer.addEventListener('click', function(event) {
@@ -48,5 +48,5 @@
                 }
             }
         });
-    </script>
+    </script> {% endcomment %}
 {% endblock %}

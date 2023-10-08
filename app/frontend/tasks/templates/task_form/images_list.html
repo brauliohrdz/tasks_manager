@@ -1,9 +1,9 @@
-<div id="task_images" class="mt-1 pt-1 d-flex" style="">
+<div id="task_images" class="mt-1 pt-1 row list-container" style="">
 {% for image in task.images.all %}
-    <div class="card deletable-item" style="width: 18rem;">
-        <img src="{{image.image.url}}" class="card-img-top" alt="">
+    <div class="card deletable-list-item m-2" style="width: 18rem;">
+        <img src="{{image.image.url}}" class="img-thumbnail" alt="">
         <div class="card-body">
-            <a data-href="{% url 'tasks_image_delete' image.uuid %}" class="delete-link btn-outline-danger btn-sm"> <ion-icon name="trash"></ion-icon> Eliminar</a>
+            <a href="{% url 'tasks_image_delete' image.uuid %}" class="delete-link btn-outline-danger btn-sm"> <ion-icon name="trash"></ion-icon> Eliminar</a>
         </div>
     </div>
     {% empty%}

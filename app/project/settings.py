@@ -135,9 +135,10 @@ USE_TZ = True
 
 
 # Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-STATIC_URL = "static/"
+STATIC_URL = "/static/"
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
+STATICFILES_DIRS = [os.path.join(BASE_DIR, "frontend", "static")]
 
 # Media files (images, documents ...)
 MEDIA_FOLDER_NAME = "media"
@@ -164,15 +165,6 @@ REST_FRAMEWORK = {
 LOGIN_URL = "/accounts/login/"
 LOGIN_REDIRECT_URL = "/"
 
-# Settings for tests
-if "test" in sys.argv or "test_coverage" in sys.argv:
-    import tempfile
-
-    MEDIA_ROOT = tempfile.gettempdir()
-    DEBUG = True
-    ALLOWED_HOSTS = ["*"]
-    UPLOAD_IMAGES_PATH = "test/images/"
-
 
 USE_S3 = env("USE_S3")
 
@@ -191,3 +183,13 @@ if USE_S3:
     PUBLIC_MEDIA_LOCATION = "media"
     MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/{PUBLIC_MEDIA_LOCATION}/"
     DEFAULT_FILE_STORAGE = "project.files_storage.MediaStorage"
+
+
+# Settings for tests
+if "test" in sys.argv or "test_coverage" in sys.argv:
+    import tempfile
+
+    MEDIA_ROOT = tempfile.gettempdir()
+    DEBUG = True
+    ALLOWED_HOSTS = ["*"]
+    UPLOAD_IMAGES_PATH = "test/images/"
