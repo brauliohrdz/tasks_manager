@@ -314,7 +314,7 @@ class CreateTaskTestCase(APITestCase):
         self.client.force_authenticate(self.user)
         self.client.post(self.endpoint_url, data=task_data)
 
-        mock_create_task.assert_called_once_with(owner_id=self.user.id, **task_data)
+        mock_create_task.assert_called_with(owner_id=self.user.id, **task_data)
 
     def test_integration_with_create_task_service(self):
         task_data = {

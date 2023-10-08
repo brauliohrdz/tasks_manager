@@ -51,8 +51,10 @@ class CreateTask(APIView):
     def post(self, request):
         try:
             task_data = self._validate_data(request.POST)
-            create_task(owner_id=request.user.id, **task_data)
-            return Response(status=status.HTTP_201_CREATED)
+            task_obj = create_task(owner_id=request.user.id, **task_data)
+            return Response(
+                {"uuid": str(task_obj.uuid)}, status=status.HTTP_201_CREATED
+            )
         except serializers.ValidationError as e:
             return Response({"error": e.detail}, status=status.HTTP_400_BAD_REQUEST)
 
