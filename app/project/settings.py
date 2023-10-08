@@ -193,3 +193,5 @@ if "test" in sys.argv or "test_coverage" in sys.argv:
     DEBUG = True
     ALLOWED_HOSTS = ["*"]
     UPLOAD_IMAGES_PATH = "test/images/"
+    MEDIA_URL = "/media/"
+    DEFAULT_FILE_STORAGE = "django.core.files.storage.FileSystemStorage"
