@@ -1,0 +1,15 @@
+<div class="pagination">
+    {% if page.has_previous %}
+    <a href="?page=1" class="btn btn-link">Primera</a>
+    <a href="?page={{ page.previous_page_number }}" class="btn btn-link">Anterior</a>
+    {% endif %}
+
+    <span class="current mt-2 text-muted">
+    Página {{ page.number }} de {{ page.paginator.num_pages }}.
+    </span>
+
+    {% if page.has_next %}
+    <a href="?page={{ page.next_page_number }}" class="btn btn-link">Siguiente</a>
+    <a href="?page={{ page.paginator.num_pages }}" class="btn btn-link">Última</a>
+    {% endif %}
+</div>

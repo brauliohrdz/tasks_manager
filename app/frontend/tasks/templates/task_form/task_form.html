@@ -1,0 +1,33 @@
+<div class="card card-body">
+    <h2>Task Form</h2>
+    <hr>
+    <form method="post">
+        {% csrf_token %}
+        
+        <div class="mb-3">
+            <label for="{{ form.title.id_for_label }}" class="form-label">Title:</label>
+            <input type="text" class="form-control" id="{{ form.title.id_for_label }}" name="{{ form.title.name }}" value="{{ form.title.value|default:"" }}" required>
+        </div>
+        
+        <div class="mb-3">
+            <label for="{{ form.description.id_for_label }}" class="form-label">Description:</label>
+            <textarea class="form-control" id="{{ form.description.id_for_label }}" name="{{ form.description.name }}" required>{{ form.description.value|default:"" }}</textarea>
+        </div>
+        
+        <div class="mb-3">
+            <label for="{{ form.status.id_for_label }}" class="form-label">Status:</label>
+            <select class="form-control" id="{{ form.status.id_for_label }}" name="{{ form.status.name }}" required>
+                {% for value, text in form.status.field.choices %}
+                    <option value="{{ value }}" {% if value == form.status.value %}selected{% endif %}>{{ text }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <div class="mb-3">
+            <label for="{{ form.expires.id_for_label }}" class="form-label">Expires:</label>
+            <input type="date" class="form-control" id="{{ form.expires.id_for_label }}" name="{{ form.expires.name }}" value="{{ form.expires.value }}">
+        </div>
+
+        <button type="submit" class="btn btn-outline-secondary">Guardar</button>
+    </form>
+</div>

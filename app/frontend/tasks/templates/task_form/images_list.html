@@ -1,0 +1,12 @@
+<div id="task_images" class="mt-1 pt-1 d-flex" style="">
+{% for image in task.images.all %}
+    <div class="card deletable-item" style="width: 18rem;">
+        <img src="{{image.image.url}}" class="card-img-top" alt="">
+        <div class="card-body">
+            <a data-href="{% url 'tasks_image_delete' image.uuid %}" class="delete-link btn-outline-danger btn-sm"> <ion-icon name="trash"></ion-icon> Eliminar</a>
+        </div>
+    </div>
+    {% empty%}
+    <div class="alert alert-info"> Sin imágenes para mostrar </div>
+{% endfor %}
+</div>

@@ -1,0 +1,19 @@
+<form action="" method="get" class="form form-inline">
+    <div class="row">
+        <div class="offset-2 col-4">
+        <input type="text" name="title" class="form-control" value="{{ request.GET.title }}" placeholder="Titulo de la tarea">
+        </div>
+        <div class="col-2">
+            <select name="status" class="form-select" placeholder="Estado">
+                <option><small class="text text-black-50">Seleccione un estado</small></option>
+                <option value="pending">Pendiente</option>
+                <option value="in_progress">En progreso</option>
+                <option value="completed">Completada</option>
+            </select>
+        </div>
+        <div class="col-4">
+        <button type="submit" class="btn btn-primary btn-sm"> <ion-icon name="search-outline" class="pt-1"></ion-icon> Buscar</button>
+        <input type="reset" value="Eliminar filtros" class="btn btn-link bn-sm">
+        </div>
+    </div>
+    </form>

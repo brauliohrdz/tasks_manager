@@ -1,0 +1,32 @@
+<div class="card row-hover pos-relative py-3 px-3 mb-3 border-primary bg-light border-top-0 border-right-0 border-bottom-0 rounded-0">
+    <div class="row align-items-center">
+      <div class="col-md-8 mb-3 mb-sm-0">
+        <h5>
+          {{task.title}}
+        </h5>
+        <p class="text-sm">Estado : {{ task.get_status_display }}
+        </p>
+        <div class="text-sm op-5">  
+            <a href="{% url "tasks_update" task.uuid %}" class="btn btn-outline-secondary btn-sm text-sm">
+                <ion-icon name="pencil"></ion-icon> Editar</a>
+            <a href="{% url "tasks_delete" task.uuid %}" class="delete_link btn btn-outline-danger btn-sm text-sm">
+                <ion-icon name="trash"></ion-icon> Eliminar</a></div>
+      </div>
+      <div class="col-md-4 op-7">
+        <div class="row text-center op-7" title="Fecha de creación">
+          <div class="col px-1"> <ion-icon name="calendar-number-outline"></ion-icon> <span class="d-block text-sm">  
+                {{ task.created|date:"d-m-Y"}}
+          </span> 
+        </div>
+          <div class="col px-1" title="Fecha de expiración "><ion-icon name="calendar-clear-outline"></ion-icon>
+            <span class="d-block text-sm">
+            {% if task.expires %} {{ task.expires }} {% else %} No {% endif %}
+            </span> </div>
+         
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+

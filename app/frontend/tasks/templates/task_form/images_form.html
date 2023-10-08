@@ -1,0 +1,10 @@
+<form method="post" action="{% url 'tasks_image_create' task.uuid %}" 
+    enctype="multipart/form-data" class="mt-4 form form-inline card card-body">
+    {% csrf_token %}
+    <div class="mb-3">
+        <label for="formFile" class="form-label">Selecciona una imagen:</label>
+        <input class="form-control" type="file" id="formFile" name="image" accept="image/*" required>
+    </div>
+    
+    <button type="submit" class="btn btn-outline-secondary">Subir imagen</button>
+</form>
