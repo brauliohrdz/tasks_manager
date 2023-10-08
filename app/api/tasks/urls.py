@@ -5,11 +5,17 @@ from .views import (
     CreateTaskImage,
     DeleteTask,
     DeleteTaskImage,
+    ListTaskImages,
     TasksList,
     UpdateTask,
 )
 
 images_patterns = [
+    path(
+        "list/<uuid:task_uuid>/",
+        ListTaskImages.as_view(),
+        name="list_task_images",
+    ),
     path(
         "create/<uuid:task_uuid>/",
         CreateTaskImage.as_view(),

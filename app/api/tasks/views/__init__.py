@@ -1,5 +1,9 @@
 from api.tasks.views.tasks_api import CreateTask, DeleteTask, TasksList, UpdateTask
-from api.tasks.views.tasks_images_api import CreateTaskImage, DeleteTaskImage
+from api.tasks.views.tasks_images_api import (
+    CreateTaskImage,
+    DeleteTaskImage,
+    ListTaskImages,
+)
 
 __all__ = [
     "TasksList",
@@ -8,4 +12,5 @@ __all__ = [
     "DeleteTask",
     "CreateTaskImage",
     "DeleteTaskImage",
+    "ListTaskImages",
 ]

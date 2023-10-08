@@ -1,4 +1,5 @@
 from backend.tasks.models import TaskImage
+from django.db.models import QuerySet
 
 from .task_services import get_task_for_owner
 
@@ -11,6 +12,16 @@ def get_task_image_for_owner(task_image_uuid: str, owner_id: int) -> TaskImage:
     if is_task_image_owner:
         return task_image
     raise PermissionError("User is not image owner.")
+
+
+def get_task_images_list_for_owner(
+    task_uuid: str, owner_id: int
+) -> QuerySet[TaskImage]:
+    assert task_uuid, "Task uuid is required."
+    assert owner_id, "Owner id is required."
+
+    task = get_task_for_owner(task_uuid=task_uuid, owner_id=owner_id)
+    return task.images.all()
 
 
 def create_task_image(task_uuid: int, owner_id: int, image) -> None:

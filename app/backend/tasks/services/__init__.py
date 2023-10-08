@@ -2,6 +2,7 @@ from .task_image_services import (
     create_task_image,
     delete_task_image,
     get_task_image_for_owner,
+    get_task_images_list_for_owner,
 )
 from .task_services import (
     create_task,
@@ -20,4 +21,5 @@ __all__ = [
     "get_task_image_for_owner",
     "create_task_image",
     "delete_task_image",
+    "get_task_images_list_for_owner",
 ]

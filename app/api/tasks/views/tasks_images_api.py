@@ -1,4 +1,8 @@
-from backend.tasks.services import create_task_image, delete_task_image
+from backend.tasks.services import (
+    create_task_image,
+    delete_task_image,
+    get_task_images_list_for_owner,
+)
 from django.core.exceptions import ObjectDoesNotExist
 from rest_framework import serializers, status
 from rest_framework.authentication import TokenAuthentication
@@ -44,5 +48,27 @@ class DeleteTaskImage(APIView):
                 task_image_uuid=str(task_image_uuid), owner_id=request.user.id
             )
             return Response(status=status.HTTP_204_NO_CONTENT)
+        except (ObjectDoesNotExist, PermissionError) as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ListTaskImages(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    class TaskImageSerializer(serializers.Serializer):
+        uuid = serializers.UUIDField()
+        image = serializers.ImageField()
+
+    def get(self, request, task_uuid):
+        try:
+            images_list = get_task_images_list_for_owner(
+                task_uuid=task_uuid, owner_id=request.user.id
+            )
+
+            return Response(
+                self.TaskImageSerializer(images_list, many=True).data,
+                status=status.HTTP_204_NO_CONTENT,
+            )
         except (ObjectDoesNotExist, PermissionError) as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
