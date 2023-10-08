@@ -39,7 +39,7 @@ class TasksListViewTestCase(TestCase):
         tasks = response.context.get("page")
         tasks_titles = [task.title for task in tasks]
         self.assertEqual(len(tasks_titles), 2)
-        self.assertListEqual(["my_task_1", "my_task_2"], tasks_titles)
+        self.assertListEqual(["my_task_2", "my_task_1"], tasks_titles)
 
 
 class CreateTaskViewTestCase(TestCase):

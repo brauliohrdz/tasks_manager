@@ -165,7 +165,7 @@ class ListTasksForUserTestCase(BaseTaskTestCase):
         TaskTestUtils.create(id=2, title="Homer task1", owner_id=self.user.id)
         TaskTestUtils.create(id=3, title="Homer task2", owner_id=self.user.id)
 
-        expected_tasks_ids_for_user = [2, 3]
+        expected_tasks_ids_for_user = [3, 2]
 
         tasks = list_tasks_for_user(id=self.user.id)
         retrieved_tasks_ids_for_user = list(tasks.values_list("id", flat=True))
