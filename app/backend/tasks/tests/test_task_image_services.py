@@ -2,6 +2,7 @@ from backend.tasks.services import (
     create_task_image,
     delete_task_image,
     get_task_image_for_owner,
+    get_task_images_list_for_owner,
 )
 from backend.users.tests.utils import UserTestUtils
 from django.core.exceptions import ObjectDoesNotExist
@@ -131,3 +132,51 @@ class AddTaskImageTestCase(BaseTaskImageTestCase):
         self.assertEqual(
             task_image.image.read(), TaskImageTestUtils.simple_uploaded_image().read()
         )
+
+
+class ListTaskImageTestCase(BaseTaskImageTestCase):
+    @classmethod
+    def setUpTestData(cls) -> None:
+        cls.user = UserTestUtils.create(username="homerjay@example.com")
+        cls.task = TaskTestUtils.create(title="My task", owner_id=cls.user.id)
+
+    def test_task_uuid_is_required(self):
+        with self.assertRaisesMessage(AssertionError, "Task uuid is required."):
+            get_task_images_list_for_owner(task_uuid="", owner_id=self.user.id)
+
+    def test_task_owner_is_required(self):
+        with self.assertRaisesMessage(AssertionError, "Owner id is required."):
+            get_task_images_list_for_owner(task_uuid=self.task.uuid, owner_id="")
+
+    def test_non_existent_task_uuid_raises_exception(self):
+        non_existent_uuid = "f9fa2e26-6c95-4cc8-ad70-707ace27c26a"
+        with self.assertRaisesMessage(
+            ObjectDoesNotExist, "Task matching query does not exist."
+        ):
+            get_task_images_list_for_owner(
+                task_uuid=non_existent_uuid, owner_id=self.user.id
+            )
+
+    def test_only_task_owner_can_list_images(self):
+        no_owned_task = TaskTestUtils.create(title="no owned task")
+        with self.assertRaisesMessage(PermissionError, "User is not task owner."):
+            get_task_images_list_for_owner(
+                task_uuid=no_owned_task.uuid, owner_id=self.user.id
+            )
+
+    def test_add_task_image(self):
+        uuids = [
+            "fbb45ef5-6d46-435c-9eef-e39783a5abbb",
+            "ed7358e8-9c1c-4457-b0af-ee652c9c8cf9",
+        ]
+        TaskImageTestUtils.create(task_id=self.task.id, uuid=uuids[0])
+        TaskImageTestUtils.create(task_id=self.task.id, uuid=uuids[1])
+
+        images = get_task_images_list_for_owner(
+            task_uuid=self.task.uuid, owner_id=self.user.id
+        )
+
+        images_uuids = [str(image.uuid) for image in images]
+        expected_images_uuids = [uuids[0], uuids[1]]
+
+        self.assertListEqual(images_uuids, expected_images_uuids)

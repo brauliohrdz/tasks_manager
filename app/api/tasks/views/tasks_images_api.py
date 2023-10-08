@@ -65,10 +65,9 @@ class ListTaskImages(APIView):
             images_list = get_task_images_list_for_owner(
                 task_uuid=task_uuid, owner_id=request.user.id
             )
-
             return Response(
                 self.TaskImageSerializer(images_list, many=True).data,
-                status=status.HTTP_204_NO_CONTENT,
+                status=status.HTTP_200_OK,
             )
         except (ObjectDoesNotExist, PermissionError) as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
