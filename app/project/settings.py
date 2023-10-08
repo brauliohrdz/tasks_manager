@@ -168,7 +168,7 @@ LOGIN_REDIRECT_URL = "/"
 
 USE_S3 = env("USE_S3")
 
-## Media files en AWS
+# Media files en AWS
 if USE_S3:
     SECONDS_IN_24_HOURS = 86400
 
@@ -187,11 +187,14 @@ if USE_S3:
 
 # Settings for tests
 if "test" in sys.argv or "test_coverage" in sys.argv:
+    # This library is needed for testing purposes
     import tempfile
 
-    MEDIA_ROOT = tempfile.gettempdir()
     DEBUG = True
     ALLOWED_HOSTS = ["*"]
+
+    # Prevent the test-generated images from being stored on AWS.
+    MEDIA_ROOT = tempfile.gettempdir()
     UPLOAD_IMAGES_PATH = "test/images/"
     MEDIA_URL = "/media/"
     DEFAULT_FILE_STORAGE = "django.core.files.storage.FileSystemStorage"
