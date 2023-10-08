@@ -17,7 +17,7 @@ def get_task_for_owner(task_uuid: str, owner_id: int):
 
 def list_tasks_for_user(id: int, query_params: Optional[dict] = None) -> QuerySet[Task]:
     assert id, "User id is required."
-    tasks = Task.objects.filter(owner_id=id)
+    tasks = Task.objects.filter(owner_id=id).order_by("-created")
     if query_params:
         tasks = TasksListFilter(query_params, tasks).qs
     return tasks
