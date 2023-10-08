@@ -38,7 +38,7 @@ class CreateTaskImage(LoginRequiredMixin, View):
 
 
 class DeleteTaskImage(LoginRequiredMixin, View):
-    def get(self, request, task_image_uuid):
+    def delete(self, request, task_image_uuid):
         try:
             delete_task_image(task_image_uuid=task_image_uuid, owner_id=request.user.id)
             return HttpResponse("")

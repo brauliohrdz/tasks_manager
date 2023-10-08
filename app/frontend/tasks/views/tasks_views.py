@@ -52,7 +52,7 @@ class TasksList(LoginRequiredMixin, View):
 
 
 class CreateTask(LoginRequiredMixin, View):
-    template_name = "task_form.html"
+    template_name = "task_edit.html"
 
     def get(self, request):
         form = TaskForm()
@@ -72,7 +72,7 @@ class CreateTask(LoginRequiredMixin, View):
 
 
 class UpdateTask(LoginRequiredMixin, View):
-    template_name = "task_form.html"
+    template_name = "task_edit.html"
 
     def get(self, request, task_uuid):
         try:

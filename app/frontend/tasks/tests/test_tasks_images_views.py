@@ -80,30 +80,30 @@ class DeleteTaskImageViewTestCase(TestCase):
 
     def test_view_url(self):
         self.client.force_login(self.user)
-        response = self.client.get(self.view_url)
+        response = self.client.delete(self.view_url)
         self.assertNotEqual(response.status_code, HTTPStatus.NOT_FOUND)
         self.assertIs(response.resolver_match.func.view_class, DeleteTaskImage)
 
     def test_view_name(self):
         self.client.force_login(self.user)
         url = reverse(self.view_name, args=[self.test_uuid])
-        response = self.client.get(url)
+        response = self.client.delete(url)
         self.assertNotEqual(response.status_code, HTTPStatus.NOT_FOUND)
         self.assertIs(response.resolver_match.func.view_class, DeleteTaskImage)
 
     def test_login_required(self):
-        response = self.client.get(self.view_url)
+        response = self.client.delete(self.view_url)
         self.assertEqual(response.status_code, HTTPStatus.FOUND)
 
     def test_non_existent_task_image_uuid_returns_400(self):
         self.client.force_login(self.user)
-        response = self.client.get(self.view_url)
+        response = self.client.delete(self.view_url)
         self.assertEqual(response.status_code, HTTPStatus.BAD_REQUEST)
 
     def test_non_task_owner_cannot_delete_task_image(self):
         TaskImageTestUtils.create(uuid=self.test_uuid)
         self.client.force_login(self.user)
-        response = self.client.get(self.view_url)
+        response = self.client.delete(self.view_url)
         self.assertEqual(response.status_code, HTTPStatus.FORBIDDEN)
 
     def test_user_can_delete_task_image(self):
@@ -113,6 +113,6 @@ class DeleteTaskImageViewTestCase(TestCase):
         TaskImageTestUtils.create(uuid=self.test_uuid, task_id=task.id)
         self.assertIsNotNone(TaskImageTestUtils.first(uuid=self.test_uuid))
         self.client.force_login(self.user)
-        response = self.client.get(self.view_url)
+        response = self.client.delete(self.view_url)
         self.assertEqual(response.status_code, HTTPStatus.OK)
         self.assertIsNone(TaskImageTestUtils.first(uuid=self.test_uuid))
