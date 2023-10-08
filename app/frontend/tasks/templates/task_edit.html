@@ -13,38 +13,6 @@
         <div class="mt-3  mb-3"></div>
         {% include "task_form/images_list.html" %}
     </div>
-    {% comment %} <script>
-        const imagesContainer = document.getElementById('task_images');
-        const csrfToken = document.querySelector("[name='csrfmiddlewaretoken']").getAttribute("value")
-        imagesContainer.addEventListener('click', function(event) {
-            if (event.target.classList.contains('delete-link')) {
-                event.preventDefault();
-                
-                if (confirm('¿Estás seguro de que deseas eliminar este elemento?')) {
-                    var deleteUrl = event.target.getAttribute('data-href');
-                    
-                    fetch(deleteUrl, {
-                        method: 'DELETE',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRFToken': csrfToken
-                        },
-                    })
-                    .then(response => {
-                        if (response.status === 200) {
-                            event.target.closest(".deletable-item").remove()
-                        } else {
-                            alert('Error al eliminar el elemento.');
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                    });
-                }
-            }
-        });
-    </script> {% endcomment %}
-    
     {% endif %}
 </div>
 

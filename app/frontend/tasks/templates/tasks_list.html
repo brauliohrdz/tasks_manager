@@ -18,35 +18,4 @@
     </div>
    {% include "tasks_list/pagination.html" %}
    {% csrf_token %}
-    {% comment %} <script>
-        const imagesContainer = document.getElementById('tasks_list');
-        const csrfToken = document.querySelector("[name='csrfmiddlewaretoken']").getAttribute("value")
-        imagesContainer.addEventListener('click', function(event) {
-            if (event.target.classList.contains('delete_link')) {
-                event.preventDefault();
-                
-                if (confirm('¿Estás seguro de que deseas eliminar este elemento?')) {
-                    var deleteUrl = event.target.getAttribute('href');
-                    
-                    fetch(deleteUrl, {
-                        method: 'DELETE',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRFToken': csrfToken
-                        },
-                    })
-                    .then(response => {
-                        if (response.status === 200) {
-                            event.target.closest("li").remove()
-                        } else {
-                            alert('Error al eliminar el elemento.');
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                    });
-                }
-            }
-        });
-    </script> {% endcomment %}
 {% endblock %}
