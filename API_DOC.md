@@ -1,166 +1,173 @@
 [TOC]
 
-# API Documentation
+# Documentación de la API
 
-## Authentication
-To access the API, you need to authenticate using the following endpoint:
+## Autenticación
+Para acceder a la API, es necesario autenticarse utilizando el siguiente punto final:
 
 **Endpoint:** `/api/v1/auth/token/`
 
-**Method:** `POST`
+**Método:** `POST`
 
-**Request Body:**
-- `username` (string): User's username.
-- `password` (string): User's password.
+**Cuerpo de la Solicitud:**
+- `username` (cadena): Nombre de usuario del usuario.
+- `password` (cadena): Contraseña del usuario.
 
-**Response:**
-- Status Code: 200 OK
-- Body: A JSON object containing the user's authentication token.
+**Respuesta:**
+- Código de Estado: 200 OK
+- Cuerpo: Un objeto JSON que contiene el token de autenticación del usuario.
 
 ---
 
-## Tasks
+## Tareas
 
-### List Tasks
-Retrieves a list of tasks from the database.
+### Listar Tareas
+Recupera una lista paginada de tareas de la base de datos.
 
 **Endpoint:** `/api/v1/tasks/list/`
 
-**Method:** `GET`
+**Método:** `GET`
 
-**Request Headers:**
-- `Authorization`: Token for API access.
+**Cabeceras de la Solicitud:**
+- `Authorization`: Token para acceder a la API.
 
-**Response:**
-- Status Code: 200 OK
-- Body: A dictionary containing the list of tasks obtained from the API.
+**Respuesta:**
+- Código de Estado: 200 OK
+- Cuerpo: Una lista paginada que contiene diccionarios con las siguientes claves:
+  - `uuid` (cadena): UUID de la tarea.
+  - `title` (cadena): Título de la tarea.
+  - `created` (cadena): Marca de tiempo que indica el momento de creación de la tarea.
+  - `expires` (cadena): Fecha de vencimiento de la tarea.
+  - `status` (cadena): Estado de la tarea.
 
 ---
 
-### Create Task
-Creates a new task in the database.
+### Crear Tarea
+Crea una nueva tarea en la base de datos.
 
 **Endpoint:** `/api/v1/tasks/create/`
 
-**Method:** `POST`
+**Método:** `POST`
 
-**Request Headers:**
-- `Authorization`: Token for API access.
+**Cabeceras de la Solicitud:**
+- `Authorization`: Token para acceder a la API.
 
-**Request Body:**
-- `title` (string): Title of the task.
-- `description` (string): Description of the task.
-- `expires` (string): Expiry date of the task.
-- `status` (string): Status of the task.
+**Cuerpo de la Solicitud:**
+- `title` (cadena): Título de la tarea.
+- `description` (cadena): Descripción de la tarea.
+- `expires` (cadena): Fecha de vencimiento de la tarea.
+- `status` (cadena): Estado de la tarea.
 
-**Response:**
-- Status Code: 201 Created
-- Body: A JSON object containing the UUID of the created task.
+**Respuesta:**
+- Código de Estado: 201 Created
+- Cuerpo: Un objeto JSON que contiene el UUID de la tarea creada.
 
 ---
 
-### Update Task
-Updates an existing task in the database.
+### Actualizar Tarea
+Actualiza una tarea existente en la base de datos.
 
 **Endpoint:** `/api/v1/tasks/update/{task_uuid}/`
 
-**Method:** `PUT`
+**Método:** `PUT`
 
-**Request Headers:**
-- `Authorization`: Token for API access.
+**Cabeceras de la Solicitud:**
+- `Authorization`: Token para acceder a la API.
 
-**Request Body:**
-- `title` (string): Updated title of the task.
-- `description` (string): Updated description of the task.
-- `expires` (string): Updated expiry date of the task.
-- `status` (string): Updated status of the task.
+**Cuerpo de la Solicitud:**
+- `title` (cadena): Título actualizado de la tarea.
+- `description` (cadena): Descripción actualizada de la tarea.
+- `expires` (cadena): Fecha de vencimiento actualizada de la tarea.
+- `status` (cadena): Estado actualizado de la tarea.
 
-**Response:**
-- Status Code: 204 No Content
+**Respuesta:**
+- Código de Estado: 204 No Content
 
 ---
 
-### Delete Task
-Deletes a task from the database.
+### Eliminar Tarea
+Elimina una tarea de la base de datos.
 
 **Endpoint:** `/api/v1/tasks/delete/{task_uuid}/`
 
-**Method:** `DELETE`
+**Método:** `DELETE`
 
-**Request Headers:**
-- `Authorization`: Token for API access.
+**Cabeceras de la Solicitud:**
+- `Authorization`: Token para acceder a la API.
 
-**Response:**
-- Status Code: 204 No Content
+**Respuesta:**
+- Código de Estado: 204 No Content
 
+---
 
+## Imágenes de Tareas
 
-## Task Images
-
-### Create Task Image
-Creates a new image associated with a task.
+### Crear Imagen de Tarea
+Crea una nueva imagen asociada a una tarea.
 
 **Endpoint:** `/api/v1/tasks/image/create/{task_uuid}/`
 
-**Method:** `POST`
+**Método:** `POST`
 
-**Request Headers:**
-- `Authorization`: Token for API access.
+**Cabeceras de la Solicitud:**
+- `Authorization`: Token para acceder a la API.
 
-**Request Body:**
-- `image` (file): The image file to be uploaded.
-- `image_type` (string): Type of the image (e.g., 'image/jpeg' or 'image/png').
+**Cuerpo de la Solicitud:**
+- `image` (archivo): El archivo de imagen que se va a subir.
+- `image_type` (cadena): Tipo de la imagen (por ejemplo, 'image/jpeg' o 'image/png').
 
-**Response:**
-- Status Code: 201 Created
-- Body: A JSON object containing the URL of the created image.
+**Respuesta:**
+- Código de Estado: 201 Created
+- Cuerpo: Un objeto JSON que contiene la URL de la imagen creada.
 
 ---
 
-### List Task Images
-Lists images associated with a specific task.
+### Listar Imágenes de Tarea
+Enumera las imágenes asociadas a una tarea específica.
 
 **Endpoint:** `/api/v1/tasks/image/list/{task_uuid}/`
 
-**Method:** `GET`
+**Método:** `GET`
 
-**Request Headers:**
-- `Authorization`: Token for API access.
+**Cabeceras de la Solicitud:**
+- `Authorization`: Token para acceder a la API.
 
-**Response:**
-- Status Code: 200 OK
-- Body: A dictionary containing the list of images associated with the task.
+**Respuesta:**
+- Código de Estado: 200 OK
+- Cuerpo: Una lista de diccionarios. Cada diccionario contiene las siguientes claves:
+  - `uuid` (cadena): UUID de la imagen.
+  - `image` (cadena): URL de la imagen.
 
 ---
 
-### Delete Task Image
-Deletes the image with the specified UUID.
+### Eliminar Imagen de Tarea
+Elimina la imagen con el UUID especificado.
 
 **Endpoint:** `/api/v1/tasks/image/delete/{image_uuid}/`
 
-**Method:** `DELETE`
+**Método:** `DELETE`
 
-**Request Headers:**
-- `Authorization`: Token for API access.
+**Cabeceras de la Solicitud:**
+- `Authorization`: Token para acceder a la API.
 
-**Response:**
-- Status Code: 204 No Content
+**Respuesta:**
+- Código de Estado: 204 No Content
 
 ---
 
-### Helper Function: Authentication Header
-Generates the authentication header with the provided token.
+### Función Auxiliar: Encabezado de Autenticación
+Genera el encabezado de autenticación con el token proporcionado.
 
-**Function:**
+**Función:**
 ```python
 def auth_header(token: str) -> dict:
     """
-    Generates the authentication header with the provided token.
+    Genera el encabezado de autenticación con el token proporcionado.
     
     Args:
-        token (str): Authorization token.
+        token (cadena): Token de autorización.
     
     Returns:
-        dict: A dictionary containing the authorization header.
+        dict: Un diccionario que contiene el encabezado de autorización.
     """
     return {"Authorization": f"Token {token}"}

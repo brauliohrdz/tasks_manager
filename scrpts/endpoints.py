@@ -192,7 +192,7 @@ def list_task_images(token: str, task_uuid: str) -> dict:
     """
     url = BASE_API_URL % {"endpoint_path": f"tasks/image/list/{task_uuid}"}
     headers = auth_header(token)
-    return requests.get(url, headers=headers)
+    return requests.get(url, headers=headers).json()
 
 
 def delete_task_image(token: str, image_uuid: str) -> None:
@@ -212,3 +212,45 @@ def delete_task_image(token: str, image_uuid: str) -> None:
     url = BASE_API_URL % {"endpoint_path": f"tasks/image/delete/{image_uuid}"}
     headers = auth_header(token)
     return requests.delete(url, headers=headers)
+
+
+if __name__ == "__main__":
+    token = login()
+    print("> Crete task")
+    task_uuid = create_task(
+        token, title="My task", description="my des", expires=None, status="pending"
+    )
+    print(task_uuid)
+
+    print("> Update ")
+    response = update_task(
+        token,
+        task_uuid,
+        title="My task",
+        description="my des",
+        expires="2023-10-10",
+        status="pending",
+    )
+    print(response.status_code)
+
+    print("> List")
+    tasks = list_tasks(token)
+    print(tasks, "\n")
+
+    print("> Image")
+    image = task_image_create(
+        token, task_uuid, "/home/braulio/Descargas/LOOLOO.jpg", "image/jpeg"
+    )
+    print(image)
+
+    print("> List images")
+    images = list_task_images(token, task_uuid)
+    print(images, "\n")
+
+    print("> Delete Image")
+    response = delete_task_image(token, images[0].get("uuid"))
+    print(response.status_code)
+
+    print("> Delete Task")
+    response = delete_task(token, task_uuid)
+    print(response.status_code)
