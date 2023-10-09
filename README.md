@@ -135,6 +135,16 @@ docker exec -i tasks_manager_web_1 python manage.py shell < scripts/init_data.py
 
 
 
+**Ejecutar los test**
+
+El sistema dispone de unos 150 test que se ejecutan en aproximadamente 15s
+
+```bash
+docker exec -it tasks_manager_web_1 python manage.py test
+```
+
+
+
 ##### Acceso a la interfaz web
 
 El acceso a la interfaz web se realiza mediante http://localhost:9000  con el contenedor en ejecución. 
