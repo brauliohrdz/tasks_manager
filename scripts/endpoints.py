@@ -19,7 +19,7 @@ def login() -> str:
 
     """
     url = BASE_API_URL % {"endpoint_path": "auth/token"}
-    post_data = {"username": "demo", "password": "demo1234"}
+    post_data = {"username": "demo", "password": "demo"}
 
     response = requests.post(url, data=post_data)
     return response.json().get("token")
@@ -238,9 +238,7 @@ if __name__ == "__main__":
     print(tasks, "\n")
 
     print("> Image")
-    image = task_image_create(
-        token, task_uuid, "/home/braulio/Descargas/LOOLOO.jpg", "image/jpeg"
-    )
+    image = task_image_create(token, task_uuid, "LOCAL_IMAGE_PATH_HERE", "image/jpeg")
     print(image)
 
     print("> List images")
