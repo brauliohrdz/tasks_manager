@@ -40,4 +40,5 @@ def delete_task_image(task_image_uuid: int, owner_id: int) -> None:
     assert owner_id, "Owner id is required."
 
     task_image = get_task_image_for_owner(task_image_uuid, owner_id)
+    task_image.image.delete(save=False)
     task_image.delete()
