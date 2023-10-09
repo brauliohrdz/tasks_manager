@@ -61,9 +61,11 @@ class CreateTask(LoginRequiredMixin, View):
     def post(self, request):
         form = TaskForm(request.POST)
         if form.is_valid():
-            create_task(owner_id=request.user.id, **form.cleaned_data)
+            created_task = create_task(owner_id=request.user.id, **form.cleaned_data)
             messages.success(request, "La tarea se ha creado correctamente")
-            return HttpResponseRedirect(reverse("tasks_list"))
+            return HttpResponseRedirect(
+                reverse("tasks_update", args=[created_task.uuid])
+            )
         return render(
             request,
             self.template_name,
