@@ -1,14 +1,14 @@
 <form action="" method="get" class="form form-inline">
     <div class="row">
         <div class="offset-2 col-4">
-        <input type="text" name="title" class="form-control" value="{{ request.GET.title }}" placeholder="Titulo de la tarea">
+        <input type="text" name="{{ search_form.title.name }}" class="form-control" value="{{ search_form.title.value|default:'' }}" placeholder="Titulo de la tarea">
         </div>
         <div class="col-2">
-            <select name="status" class="form-select" placeholder="Estado">
+            <select name="{{search_form.status.name}}" class="form-select" placeholder="Estado">
                 <option><small class="text text-black-50">Seleccione un estado</small></option>
-                <option value="pending">Pendiente</option>
-                <option value="in_progress">En progreso</option>
-                <option value="completed">Completada</option>
+                {% for value, text in search_form.status.field.choices %}
+                    <option value="{{ value }}" {% if value == search_form.status.value %}selected{% endif %}>{{ text }}</option>
+                {% endfor %}
             </select>
         </div>
         <div class="col-4">

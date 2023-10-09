@@ -41,14 +41,23 @@ class TaskForm(forms.Form):
 class TasksList(LoginRequiredMixin, View):
     template_name = "tasks_list.html"
 
+    class SearchForm(forms.Form):
+        title = forms.CharField()
+        status = forms.ChoiceField(choices=Task.StatusChoices.choices)
+
     def paginate_response(self, tasks, page):
         paginator = Paginator(tasks, settings.PAGINATION_PAGE_SIZE)
         return paginator.page(page)
 
     def get(self, request):
+        search_form = self.SearchForm(request.GET)
         tasks = list_tasks_for_user(id=request.user.id, query_params=request.GET)
         tasks_page = self.paginate_response(tasks, request.GET.get("page", 1))
-        return render(request, self.template_name, {"page": tasks_page})
+        return render(
+            request,
+            self.template_name,
+            {"page": tasks_page, "search_form": search_form},
+        )
 
 
 class CreateTask(LoginRequiredMixin, View):
