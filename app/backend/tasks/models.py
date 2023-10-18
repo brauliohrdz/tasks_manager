@@ -29,7 +29,7 @@ class Task(models.Model):
         editable_fields = list(filter(field_is_editable, cls._meta.fields))
         return [field.name for field in editable_fields]
 
-    def check_fields_are_editable(self, fields: list[str]) -> bool:
+    def validate_fields_are_editable(self, fields: list[str]) -> bool:
         editable_fields = self.get_editable_fields()
         all_fields_are_editable = all([field in editable_fields for field in fields])
         if not all_fields_are_editable:

@@ -36,7 +36,7 @@ def update_task(task_uuid: int, owner_id: int, **kwargs) -> None:
 
     fields_to_update = list(kwargs.keys())
     task = get_task_for_owner(task_uuid=task_uuid, owner_id=owner_id)
-    task.check_fields_are_editable(fields_to_update)
+    task.validate_fields_are_editable(fields_to_update)
     task.set_fields(**kwargs)
     task.full_clean()
     task.save(update_fields=fields_to_update)
